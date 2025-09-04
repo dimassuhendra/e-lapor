@@ -1,0 +1,57 @@
+/* static/css/style.css */
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #f4f7f9; /* Warna latar belakang sedikit kebiruan */
+}
+
+main {
+    flex: 1;
+}
+
+/* --- Navbar Styling --- */
+.navbar-brand img {
+    height: 40px; /* Atur tinggi logo */
+    margin-right: 10px;
+}
+
+.navbar-title {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+}
+
+.navbar-title .main-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.navbar-title .sub-title {
+    font-size: 0.8rem;
+    font-weight: 300;
+}
+
+/* --- Peta Styling --- */
+#map, #map-select {
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* --- Tombol Laporan di Navbar --- */
+.navbar .btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+    transition: background-color 0.2s;
+}
+
+.navbar .btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
+/* --- Footer Styling --- */
+.footer {
+    background-color: #343a40; /* Footer tetap gelap untuk kontras */
+}

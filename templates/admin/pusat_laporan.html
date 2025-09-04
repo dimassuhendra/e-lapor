@@ -1,0 +1,150 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}Pusat Laporan{% endblock %}
+
+{% block page_title %}Pusat Laporan & Ekspor Data{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm border-0 mb-4">
+  <div class="card-header bg-light border-0">
+    <h5 class="mb-0 fw-bold">Filter Laporan untuk Dilihat & Diekspor</h5>
+  </div>
+  <div class="card-body">
+    <form method="GET" action="{{ url_for('pusat_laporan') }}" id="filterForm">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label for="start_date" class="form-label">Tanggal Mulai</label>
+          <input type="date" class="form-control" id="start_date" name="start_date"
+            value="{{ filters.start_date if filters.start_date else '' }}">
+        </div>
+        <div class="col-md-6">
+          <label for="end_date" class="form-label">Tanggal Selesai</label>
+          <input type="date" class="form-control" id="end_date" name="end_date"
+            value="{{ filters.end_date if filters.end_date else '' }}">
+        </div>
+
+        <div class="col-md-4">
+          <label for="kategori" class="form-label">Kategori</label>
+          <select class="form-select" id="kategori" name="kategori">
+            <option value="">Semua Kategori</option>
+            {% for kat in kategori_list %}
+            <option value="{{ kat.nama_kategori }}"
+              {% if filters.kategori == kat.nama_kategori %}selected{% endif %}>
+              {{ kat.nama_kategori }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-md-4">
+          <label for="status" class="form-label">Status</label>
+          <select class="form-select" id="status" name="status">
+            <option value="">Semua Status</option>
+            <option value="Diterima" {% if filters.status == "Diterima" %}selected{% endif %}>Diterima</option>
+            <option value="Diproses" {% if filters.status == "Diproses" %}selected{% endif %}>Diproses</option>
+            <option value="Selesai" {% if filters.status == "Selesai" %}selected{% endif %}>Selesai</option>
+          </select>
+        </div>
+
+        <div class="col-md-4">
+          <label for="kecamatan" class="form-label">Kecamatan</label>
+          <select class="form-select" id="kecamatan" name="kecamatan">
+            <option value="">Semua Kecamatan</option>
+            {% for kec in kecamatan_list %}
+            <option value="{{ kec }}" {% if filters.kecamatan == kec %}selected{% endif %}>{{ kec }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <hr>
+      <div class="d-flex justify-content-end gap-2">
+        <button type="submit" class="btn btn-primary">
+          <i class="bi bi-funnel"></i> Terapkan Filter
+        </button>
+        {% if laporan_list %}
+        <a href="{{ url_for('download_laporan', format='csv', start_date=filters.start_date, end_date=filters.end_date, kategori=filters.kategori, status=filters.status, kecamatan=filters.kecamatan) }}" class="btn btn-success">
+          <i class="bi bi-file-earmark-spreadsheet"></i> Unduh CSV
+        </a>
+        <a href="{{ url_for('download_laporan', format='pdf', start_date=filters.start_date, end_date=filters.end_date, kategori=filters.kategori, status=filters.status, kecamatan=filters.kecamatan) }}" class="btn btn-danger">
+          <i class="bi bi-file-earmark-pdf"></i> Unduh PDF
+        </a>
+        {% endif %}
+      </div>
+    </form>
+  </div>
+</div>
+
+{% if laporan_list %}
+<div class="card mt-4">
+    <div class="card-header d-flex justify-content-between align-items-center bg-success text-white">
+        <h5 class="mb-0">Hasil Filter Laporan ({{ laporan_list|length }} data ditemukan)</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table id="laporanTable" class="table table-hover table-striped align-middle">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Tanggal</th>
+                        <th>Judul</th>
+                        <th>Kategori</th>
+                        <th>Status</th>
+                        <th>Kecamatan</th>
+                        <th>Kelurahan</th>
+                        <th>Dinas Penugas</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for laporan in laporan_list %}
+                    <tr>
+                        <td>{{ laporan['id'] }}</td>
+                        <td>{{ laporan['timestamp'] }}</td>
+                        <td>{{ laporan['judul'] }}</td>
+                        <td>{{ laporan['kategori'] }}</td>
+                        <td>
+                            {% if laporan['status'] == 'Selesai' %}
+                                <span class="badge bg-success">{{ laporan['status'] }}</span>
+                            {% elif laporan['status'] == 'Diproses' %}
+                                <span class="badge bg-warning text-dark">{{ laporan['status'] }}</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ laporan['status'] }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ laporan['kecamatan'] }}</td>
+                        <td>{{ laporan['kelurahan'] }}</td>
+                        <td>{{ laporan['dinas_penugas'] or '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-info mt-4">
+    <i class="bi bi-info-circle"></i> Tidak ada data laporan yang cocok dengan filter yang dipilih.
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script>
+$(document).ready(function() {
+  $('#laporanTable').DataTable({
+    pageLength: 10,
+    lengthMenu: [5, 10, 25, 50],
+    order: [[1, 'desc']], // Urutkan berdasarkan kolom tanggal (kolom ke-2, index 1)
+    language: {
+      url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/id.json"
+    }
+  });
+});
+</script>
+{% endblock %}

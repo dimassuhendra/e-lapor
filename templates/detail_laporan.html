@@ -1,0 +1,95 @@
+{% extends "layout.html" %}
+
+{% block title %}Detail Laporan #{{ laporan.id }}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h2 class="mb-0">Detail Laporan #{{ laporan.id }}</h2>
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">Kembali ke Peta</a>
+    </div>
+    <div class="card-body">
+        <!-- Menampilkan Pengumuman Publik Terkait Laporan -->
+        {% if laporan.pengumuman_publik %}
+        <div class="alert alert-info">
+            <h5 class="alert-heading">Pemberitahuan dari Petugas</h5>
+            <p>{{ laporan.pengumuman_publik }}</p>
+        </div>
+        {% endif %}
+
+        <div class="row">
+            <div class="col-md-7">
+                <h3>{{ laporan.judul }}</h3>
+                <table class="table table-bordered mt-3">
+                    <tbody>
+                        <tr>
+                            <th style="width: 30%;">Kategori</th>
+                            <td>{{ laporan.kategori }}</td>
+                        </tr>
+                        <tr>
+                            <th>Status</th>
+                            <td>
+                                <span class="badge fs-6
+                                {% if laporan.status == 'Diterima' %} bg-warning
+                                {% elif laporan.status == 'Diproses' %} bg-info
+                                {% else %} bg-success {% endif %}
+                                ">{{ laporan.status }}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Tanggal Dilaporkan</th>
+                            <td>{{ laporan.timestamp }}</td>
+                        </tr>
+                        <tr>
+                            <th>Lokasi</th>
+                            <td>{{ laporan.kelurahan }}, {{ laporan.kecamatan }}</td>
+                        </tr>
+                        <tr>
+                            <th>Deskripsi</th>
+                            <td>{{ laporan.deskripsi }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-5">
+                <h5>Galeri Foto "Sebelum & Sesudah"</h5>
+                <div class="row">
+                    <div class="col-6">
+                        <h6>Sebelum (Dari Pelapor)</h6>
+                        {% if laporan.foto %}
+                            <img src="{{ url_for('static', filename='uploads/' + laporan.foto) }}" class="img-fluid rounded" alt="Foto Laporan">
+                        {% else %}
+                            <div class="alert alert-light text-center small p-2">Tidak ada foto.</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-6">
+                        <h6>Sesudah (Dari Petugas)</h6>
+                        {% if laporan.foto_selesai %}
+                            <img src="{{ url_for('static', filename='uploads/' + laporan.foto_selesai) }}" class="img-fluid rounded" alt="Foto Selesai">
+                        {% else %}
+                            <div class="alert alert-light text-center small p-2">Belum ada foto.</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <h5>Lokasi Laporan di Peta</h5>
+        <div id="detail-map" style="height: 300px; border-radius: 8px;"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const lat = {{ laporan.latitude }};
+    const lon = {{ laporan.longitude }};
+
+    var map = L.map('detail-map').setView([lat, lon], 17);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    L.marker([lat, lon]).addTo(map)
+        .bindPopup("<b>{{ laporan.judul | e }}</b>").openPopup();
+});
+</script>
+{% endblock %}

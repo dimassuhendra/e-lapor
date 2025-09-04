@@ -1,0 +1,202 @@
+/* ==============================================
+   File CSS Input Utama untuk Proyek E-Lapor
+   ============================================== */
+
+/* 1. Impor dasar-dasar Tailwind */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==============================================
+   2. Terjemahan Kelas Bootstrap ke Tailwind
+   ============================================== */
+
+/* Layout & Card */
+.card {
+    @apply bg-white rounded-lg shadow-md mb-6 border border-gray-200;
+}
+.card-header {
+    @apply p-4 border-b border-gray-200 text-lg font-semibold rounded-t-lg;
+}
+.card-header.bg-light {
+    @apply bg-gray-50;
+}
+.card-body {
+    @apply p-6;
+}
+
+/* Grid System (Simulasi Row/Col) */
+.row {
+    @apply flex flex-wrap -mx-4; /* Margin negatif untuk gutter */
+}
+[class^="col-"] {
+    @apply w-full px-4 relative; /* Padding untuk mengimbangi margin */
+}
+@screen md {
+    .col-md-4 {
+        @apply w-4/12;
+    }
+}
+@screen lg {
+    .col-lg-4 {
+        @apply w-4/12;
+    }
+    .col-lg-6 {
+        @apply w-6/12;
+    }
+    .col-lg-8 {
+        @apply w-8/12;
+    }
+}
+
+/* Buttons (Solid & Outline) */
+.btn {
+    @apply inline-block font-medium text-center whitespace-nowrap align-middle select-none border rounded-md py-2 px-4 transition-colors duration-150 ease-in-out;
+}
+.btn-sm {
+    @apply py-1 px-3 text-sm;
+}
+.btn-primary {
+    @apply bg-blue-600 text-white border-blue-600 hover:bg-blue-700;
+}
+.btn-secondary {
+    @apply bg-gray-500 text-white border-gray-500 hover:bg-gray-600;
+}
+.btn-success {
+    @apply bg-green-500 text-white border-green-500 hover:bg-green-600;
+}
+.btn-danger {
+    @apply bg-red-600 text-white border-red-600 hover:bg-red-700;
+}
+.btn-outline-success {
+    @apply bg-transparent border border-green-500 text-green-600 hover:bg-green-500 hover:text-white;
+}
+.btn-outline-primary {
+    @apply bg-transparent border border-blue-600 text-blue-700 hover:bg-blue-600 hover:text-white;
+}
+.btn-outline-danger {
+    @apply bg-transparent border border-red-500 text-red-600 hover:bg-red-500 hover:text-white;
+}
+
+
+/* Forms (Inputs & Checkboxes) */
+.form-label {
+    @apply block text-sm font-medium text-gray-700 mb-1;
+}
+.form-control,
+.form-select {
+    @apply block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500;
+}
+.form-check {
+    @apply flex items-center gap-2;
+}
+.form-check-input {
+    @apply h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500;
+}
+.form-check-label {
+    @apply text-sm text-gray-700;
+}
+
+/* Alerts & Badges */
+.alert {
+    @apply p-4 mb-4 border rounded-lg;
+}
+.alert-info {
+    @apply bg-blue-100 border-blue-300 text-blue-800;
+}
+.alert-heading {
+    @apply font-bold text-lg mb-1;
+}
+.badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+}
+.bg-primary {
+    @apply bg-blue-600 text-white;
+}
+.bg-warning {
+    @apply bg-yellow-100 text-yellow-800;
+}
+.bg-info {
+     @apply bg-sky-100 text-sky-800;
+}
+.bg-success {
+    @apply bg-green-100 text-green-800;
+}
+.bg-dark {
+    @apply bg-gray-800 text-white;
+}
+
+/* List Group & Flex Utilities */
+.list-group {
+    @apply border border-gray-200 rounded-md;
+}
+.list-group-item {
+    @apply p-3 border-b border-gray-200;
+}
+.list-group-item:last-child {
+    @apply border-b-0;
+}
+.d-flex {
+    @apply flex;
+}
+.justify-content-between {
+    @apply justify-between;
+}
+.align-items-center {
+    @apply items-center;
+}
+.align-items-end {
+    @apply items-end;
+}
+
+/* Modal Styling */
+.modal-content {
+    @apply bg-white rounded-lg shadow-xl;
+}
+.modal-header {
+    @apply flex justify-between items-center p-4 border-b;
+}
+.modal-title {
+    @apply text-lg font-bold text-gray-800;
+}
+.modal-body {
+    @apply p-6;
+}
+.modal-footer {
+    @apply flex justify-end gap-3 p-4 bg-gray-50 rounded-b-lg;
+}
+
+/* Bootstrap Utility Classes */
+.fw-semibold {
+    @apply font-semibold;
+}
+.fw-bold {
+    @apply font-bold;
+}
+.w-100 {
+    @apply w-full;
+}
+.h-100 {
+    @apply h-full;
+}
+.mt-2 {
+    @apply mt-2;
+}
+.mb-0 {
+    @apply mb-0;
+}
+.ms-2 {
+    @apply ml-2; /* margin-start to margin-left */
+}
+.p-0 {
+    @apply p-0;
+}
+.text-center {
+    @apply text-center;
+}
+.border-0 {
+    @apply border-0;
+}
+.shadow-sm {
+    @apply shadow-sm;
+}

@@ -1,0 +1,333 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}Tindak Lanjut Laporan #{{ laporan.nomor_laporan }}{% endblock %}
+
+{% block page_title %}Tindak Lanjut Laporan #{{ laporan.nomor_laporan }}{% endblock %}
+
+{% block content %}
+{% if potential_duplicates %}
+<div class="alert alert-info">
+    <h4 class="alert-heading">Deteksi Laporan Duplikat</h4>
+    <p>Sistem mendeteksi bahwa laporan ini mungkin merupakan duplikat dari laporan lain yang sudah masuk. Klik "Bandingkan" untuk melihat detail dan mengambil tindakan.</p>
+    <ul class="list-group">
+        {% for dup in potential_duplicates %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+                <strong>Laporan #{{ dup.nomor_laporan }}:</strong> {{ dup.judul }}
+                <span class="badge bg-primary rounded-pill">{{ dup.similarity }}% Mirip</span>
+            </div>
+            <button class="btn btn-sm btn-secondary" data-bs-toggle="modal" data-bs-target="#compareModal" data-duplicate-id="{{ dup.id }}">
+                Bandingkan
+            </button>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5>Detail Laporan</h5>
+                <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary btn-sm">
+                    « Kembali ke Dashboard
+                </a>
+            </div>
+            <div class="card-body">
+                <h3>{{ laporan.judul }}</h3>
+                <table class="table table-bordered mt-3">
+                    <tbody>
+                        <tr><th style="width: 30%;">Nomor Laporan</th><td><strong>{{ laporan.nomor_laporan }}</strong></td></tr>
+                        <tr><th>Nama Pelapor</th><td>{{ laporan.nama_pelapor }}</td></tr>
+                        <tr><th>No. WhatsApp</th><td>{{ laporan.no_whatsapp or 'Tidak diisi' }}</td></tr>
+                        <tr><th style="width: 30%;">Kategori</th><td>{{ laporan.kategori }}</td></tr>
+                        <tr><th>Tanggal Dilaporkan</th><td>{{ laporan.timestamp }}</td></tr>
+                        <tr><th>Lokasi</th><td>{{ laporan.kelurahan }}, {{ laporan.kecamatan }}</td></tr>
+                        <tr><th>Deskripsi</th><td>{{ laporan.deskripsi }}</td></tr>
+                        <tr><th>Status Saat Ini</th><td>
+                            <span class="badge fs-6
+                            {% if laporan.status == 'Diterima' %} bg-diterima
+                            {% elif laporan.status == 'Diproses' %} bg-diproses
+                            {% else %} bg-selesai {% endif %}
+                            ">{{ laporan.status }}</span>
+                        </td></tr>
+                        <tr><th>Ditugaskan ke</th><td>
+                            {% if laporan.dinas_penugas %}
+                                <span class="badge bg-dark">{{ laporan.dinas_penugas }}</span>
+                            {% else %}
+                                <span class="text-muted">Belum ditugaskan</span>
+                            {% endif %}
+                        </td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><h5>Riwayat Aksi & Catatan</h5></div>
+            <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                <h6>Catatan Internal</h6>
+                <ul class="list-group list-group-flush small">
+                {% for c in catatan_list %}
+                    <li class="list-group-item">
+                        <strong>{{ c.admin_username }}</strong>: {{ c.catatan }}
+                        <div class="text-muted">{{ c.timestamp }}</div>
+                    </li>
+                {% else %}
+                    <li class="list-group-item text-muted">Belum ada catatan.</li>
+                {% endfor %}
+                </ul>
+                <h6 class="mt-3">Riwayat Aksi</h6>
+                <ul class="list-group list-group-flush small">
+                {% for r in riwayat_list %}
+                    <li class="list-group-item">
+                        <strong>{{ r.admin_username }}</strong> {{ r.aksi }}
+                        <div class="text-muted">{{ r.timestamp }}</div>
+                    </li>
+                {% else %}
+                    <li class="list-group-item text-muted">Belum ada riwayat.</li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card mb-4">
+            <div class="card-header"><h5>Aksi Petugas</h5></div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label class="form-label">Ubah Status</label>
+                        <select name="status" class="form-select">
+                            <option value="Diterima" {% if laporan.status == 'Diterima' %}selected{% endif %}>Diterima</option>
+                            <option value="Diproses" {% if laporan.status == 'Diproses' %}selected{% endif %}>Diproses</option>
+                            <option value="Selesai" {% if laporan.status == 'Selesai' %}selected{% endif %}>Selesai</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Tugaskan ke Dinas</label>
+                        <select name="dinas_penugas" id="dinas-select" class="form-select">
+                            <option value="">-- Pilih Dinas --</option>
+                            {% for dinas in dinas_list %}
+                            <option value="{{ dinas.nama_dinas }}" {% if laporan.dinas_penugas == dinas.nama_dinas %}selected{% endif %}>{{ dinas.nama_dinas }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="catatan" class="form-label">Tambah Catatan Internal</label>
+                        <textarea name="catatan" id="catatan" class="form-control" rows="2" placeholder="Contoh: Tim sudah dikirim..."></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="pengumuman_publik" class="form-label">Tulis Pengumuman Publik (Opsional)</label>
+                        <textarea name="pengumuman_publik" id="pengumuman_publik" class="form-control" rows="3" placeholder="Contoh: Perbaikan akan dilaksanakan besok pagi.">{{ laporan.pengumuman_publik or '' }}</textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="foto_selesai" class="form-label">Unggah Foto Bukti Selesai</label>
+                        <input type="file" class="form-control" name="foto_selesai" id="foto_selesai">
+                    </div>
+
+                    <hr>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Simpan Semua Perubahan</button>
+                        <button type="button" id="whatsapp-share-btn" class="btn btn-success">
+                            <i class="bi bi-whatsapp"></i> Kirim Notifikasi WA ke Dinas
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><h5>Galeri Foto & Peta</h5></div>
+            <div class="card-body">
+                <h6>Foto Laporan (Sebelum)</h6>
+                {% if laporan.foto %}
+                    <img src="{{ url_for('static', filename='uploads/' + laporan.foto) }}" class="img-fluid rounded mb-3" alt="Foto Laporan">
+                {% else %}
+                    <p class="text-muted">Tidak ada foto.</p>
+                {% endif %}
+                <h6>Foto Selesai (Sesudah)</h6>
+                {% if laporan.foto_selesai %}
+                    <img src="{{ url_for('static', filename='uploads/' + laporan.foto_selesai) }}" class="img-fluid rounded mb-3" alt="Foto Selesai">
+                {% else %}
+                    <p class="text-muted">Belum ada foto.</p>
+                {% endif %}
+                <h6>Lokasi Laporan</h6>
+                <div id="detail-map" style="height: 250px; border-radius: 8px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="compareModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Bandingkan Laporan Duplikat</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="modal-loader" class="text-center">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <div id="modal-content-area" class="d-none">
+                    <div class="row">
+                        <div class="col-md-6 border-end">
+                            <h5>Laporan Saat Ini (#{{ laporan.id }})</h5>
+                            <p><strong>Judul:</strong> {{ laporan.judul }}</p>
+                            <p><strong>Deskripsi:</strong> {{ laporan.deskripsi }}</p>
+                            <p><strong>Tanggal:</strong> {{ laporan.timestamp }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 id="duplicate-title"></h5>
+                            <p><strong>Judul:</strong> <span id="duplicate-judul"></span></p>
+                            <p><strong>Deskripsi:</strong> <span id="duplicate-deskripsi"></span></p>
+                            <p><strong>Tanggal:</strong> <span id="duplicate-tanggal"></span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="#" id="ignore-btn" class="btn btn-secondary">Bukan Duplikat</a>
+                <button type="button" id="delete-btn" class="btn btn-danger">Hapus Laporan Ini (Duplikat)</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // --- Bagian Peta dan WhatsApp (Tidak ada perubahan, sudah bagus) ---
+    const lat = {{ laporan.latitude }};
+    const lon = {{ laporan.longitude }};
+
+    var map = L.map('detail-map').setView([lat, lon], 17);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    L.marker([lat, lon]).addTo(map).bindPopup("<b>{{ laporan.judul | e }}</b>").openPopup();
+
+    const kontakDinas = {{ kontak_dinas | tojson | safe }};
+    const whatsappBtn = document.getElementById('whatsapp-share-btn');
+    const dinasSelect = document.getElementById('dinas-select');
+    
+whatsappBtn.addEventListener('click', function(e) {
+    e.preventDefault();
+    
+    const dinasTerpilih = dinasSelect.value;
+    if (!dinasTerpilih) {
+        alert('Silakan pilih dinas yang akan ditugaskan terlebih dahulu!');
+        return;
+    }
+
+    const phoneNumber = kontakDinas[dinasTerpilih];
+    if (!phoneNumber) {
+        alert('Nomor kontak untuk dinas ini tidak ditemukan.');
+        return;
+    }
+    
+    // ## PERUBAHAN DI SINI: Ambil nilai dari form catatan internal ##
+    const catatanAdmin = document.getElementById('catatan').value;
+    let catatanMessage = ""; // Siapkan variabel untuk pesan catatan
+    if (catatanAdmin.trim() !== "") {
+        // Jika ada isinya, format pesannya
+        catatanMessage = `*Catatan dari Admin:*\n${catatanAdmin}\n\n`;
+    }
+    
+    const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
+    
+    // ## PERUBAHAN DI SINI: Tambahkan variabel catatan ke dalam pesan ##
+    const message = `*PENUGASAN LAPORAN BARU*\n\n` +
+                  `*ID Laporan:* {{ laporan.id }}\n` +
+                  `*Judul:* {{ laporan.judul }}\n` +
+                  `*Kategori:* {{ laporan.kategori }}\n` +
+                  `*Lokasi:* {{ laporan.kelurahan }}, {{ laporan.kecamatan }}\n` +
+                  `*Deskripsi:* ${"{{ laporan.deskripsi | replace('\r\n', ' ') | replace('\n', ' ') }}"}\n\n` +
+                  `${catatanMessage}` + // <-- Variabel catatan ditambahkan di sini
+                  `*Lokasi (Google Maps):*\n` +
+                  `${googleMapsUrl}`;
+    
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`;
+    
+    window.open(whatsappUrl, '_blank');
+});
+
+    // --- LOGIKA MODAL DAN HAPUS DUPLIKAT YANG DIPERBARUI ---
+    const compareModal = document.getElementById('compareModal');
+    const deleteBtn = document.getElementById('delete-btn');
+    const ignoreBtn = document.getElementById('ignore-btn');
+    let duplicateReportId = null; // Variabel untuk menyimpan ID duplikat
+
+    // Event saat modal ditampilkan
+    compareModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        duplicateReportId = button.getAttribute('data-duplicate-id');
+        
+        const loader = document.getElementById('modal-loader');
+        const contentArea = document.getElementById('modal-content-area');
+        loader.classList.remove('d-none');
+        contentArea.classList.add('d-none');
+
+        // Fetch detail laporan duplikat
+        fetch(`/api/get_report/${duplicateReportId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+                document.getElementById('duplicate-title').innerText = `Potensi Duplikat (#${data.id})`;
+                document.getElementById('duplicate-judul').innerText = data.judul;
+                document.getElementById('duplicate-deskripsi').innerText = data.deskripsi;
+                document.getElementById('duplicate-tanggal').innerText = data.timestamp;
+
+                // Set href untuk tombol abaikan (jika diperlukan)
+                ignoreBtn.href = `/admin/laporan/abaikan_duplikat/{{ laporan.id }}/${duplicateReportId}`;
+
+                loader.classList.add('d-none');
+                contentArea.classList.remove('d-none');
+            });
+    });
+
+    // Event saat tombol Hapus di modal diklik
+    deleteBtn.addEventListener('click', function() {
+        if (!confirm('Anda yakin ingin menghapus laporan saat ini (#{{ laporan.id }}) sebagai duplikat?')) {
+            return; // Batalkan jika pengguna menekan "Cancel"
+        }
+
+        // Kirim permintaan hapus ke server secara asinkron
+        fetch(`/admin/laporan/hapus_duplikat/{{ laporan.id }}`, {
+            method: 'POST', // Gunakan POST untuk aksi yang mengubah data
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            // Anda bisa mengirim ID duplikat jika perlu dicatat di backend
+            body: JSON.stringify({ original_report_id: duplicateReportId }) 
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert(data.message);
+                // Redirect ke halaman dashboard setelah berhasil
+                window.location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Terjadi kesalahan saat mencoba menghapus laporan.');
+        });
+    });
+});
+</script>
+{% endblock %}

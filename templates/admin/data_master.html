@@ -1,0 +1,177 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}Manajemen Data Master{% endblock %}
+
+{% block page_title %}Manajemen Data Master{% endblock %}
+
+{% block content %}
+
+<ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="pills-dinas-tab" data-bs-toggle="pill" data-bs-target="#pills-dinas" type="button" role="tab">Manajemen Dinas</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="pills-kategori-tab" data-bs-toggle="pill" data-bs-target="#pills-kategori" type="button" role="tab">Manajemen Kategori</button>
+    </li>
+</ul>
+
+<div class="tab-content" id="pills-tabContent">
+    <div class="tab-pane fade show active" id="pills-dinas" role="tabpanel">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header"><h5>Tambah Dinas Baru</h5></div>
+                    <div class="card-body">
+                        <form method="post" action="{{ url_for('tambah_dinas') }}">
+                            <div class="mb-3">
+                                <label for="nama_dinas" class="form-label">Nama Dinas</label>
+                                <input type="text" class="form-control" id="nama_dinas" name="nama_dinas" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="kontak" class="form-label">Nomor Kontak WhatsApp</label>
+                                <input type="text" class="form-control" id="kontak" name="kontak" placeholder="Contoh: 628123456789" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Tambah Dinas</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header"><h5>Daftar Dinas Terdaftar</h5></div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Nama Dinas</th>
+                                        <th>Kontak WhatsApp</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {% for dinas in dinas_list %}
+                                    <tr>
+                                        <td>{{ dinas.nama_dinas }}</td>
+                                        <td>{{ dinas.kontak }}</td>
+                                        <td>
+                                            <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editDinasModal-{{ dinas.id }}">Edit</button>
+                                            <a href="{{ url_for('hapus_dinas', id=dinas.id) }}" class="btn btn-danger btn-sm" onclick="return confirm('Anda yakin?')">Hapus</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-pane fade" id="pills-kategori" role="tabpanel">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header"><h5>Tambah Kategori Baru</h5></div>
+                    <div class="card-body">
+                        <form method="post" action="{{ url_for('tambah_kategori') }}">
+                            <div class="mb-3">
+                                <label for="nama_kategori" class="form-label">Nama Kategori</label>
+                                <input type="text" class="form-control" id="nama_kategori" name="nama_kategori" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="deskripsi_kategori" class="form-label">Deskripsi (Opsional)</label>
+                                <textarea class="form-control" id="deskripsi_kategori" name="deskripsi" rows="2"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Tambah Kategori</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header"><h5>Daftar Kategori Laporan</h5></div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Nama Kategori</th>
+                                        <th>Deskripsi</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {% for kat in kategori_list %}
+                                    <tr>
+                                        <td>{{ kat.nama_kategori }}</td>
+                                        <td>{{ kat.deskripsi or '-' }}</td>
+                                        <td>
+                                            <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editKategoriModal-{{ kat.id }}">Edit</button>
+                                            <a href="{{ url_for('hapus_kategori', id=kat.id) }}" class="btn btn-danger btn-sm" onclick="return confirm('Anda yakin?')">Hapus</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% for dinas in dinas_list %}
+<div class="modal fade" id="editDinasModal-{{ dinas.id }}" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">Edit Dinas</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <form action="{{ url_for('edit_dinas', id=dinas.id) }}" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nama Dinas</label>
+                        <input type="text" class="form-control" name="nama_dinas" value="{{ dinas.nama_dinas }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nomor Kontak WhatsApp</label>
+                        <input type="text" class="form-control" name="kontak" value="{{ dinas.kontak }}" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{% for kat in kategori_list %}
+<div class="modal fade" id="editKategoriModal-{{ kat.id }}" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">Edit Kategori</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <form action="{{ url_for('edit_kategori', id=kat.id) }}" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nama Kategori</label>
+                        <input type="text" class="form-control" name="nama_kategori" value="{{ kat.nama_kategori }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Deskripsi</label>
+                        <textarea class="form-control" name="deskripsi" rows="2">{{ kat.deskripsi or '' }}</textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

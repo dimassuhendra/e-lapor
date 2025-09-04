@@ -1,0 +1,254 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<!-- Kartu Statistik Berdasarkan Status -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-white bg-diterima">
+            <div class="card-body">
+                <h5 class="card-title">{{ stats.diterima }}</h5>
+                <p class="card-text">Laporan Masuk (Diterima)</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-diproses">
+            <div class="card-body">
+                <h5 class="card-title">{{ stats.diproses }}</h5>
+                <p class="card-text">Laporan Diproses</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-selesai">
+            <div class="card-body">
+                <h5 class="card-title">{{ stats.selesai }}</h5>
+                <p class="card-text">Laporan Selesai</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Kartu Statistik Berdasarkan Waktu -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-light">
+            <div class="card-body">
+                <h5 class="card-title">{{ stats.hari_ini }}</h5>
+                <p class="card-text">Laporan Hari Ini</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-light">
+            <div class="card-body">
+                <h5 class="card-title">{{ stats.minggu_ini }}</h5>
+                <p class="card-text">Laporan Minggu Ini</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-light">
+            <div class="card-body">
+                <h5 class="card-title">{{ stats.bulan_ini }}</h5>
+                <p class="card-text">Laporan Bulan Ini</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-light">
+            <div class="card-body">
+                <h5 class="card-title">{{ stats.total }}</h5>
+                <p class="card-text">Total Seluruh Laporan</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Peringatan Laporan Terlambat (Collapsible) -->
+{% if laporan_terlambat %}
+<div class="alert alert-danger">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h4 class="alert-heading mb-0">Peringatan!</h4>
+            <p class="mb-0">Terdapat <strong>{{ laporan_terlambat|length }}</strong> laporan yang belum selesai lebih
+                dari 14 hari.</p>
+        </div>
+        <a class="btn btn-danger" data-bs-toggle="collapse" href="#collapsePeringatan" role="button"
+            aria-expanded="false" aria-controls="collapsePeringatan">
+            Lihat Detail
+        </a>
+    </div>
+    <div class="collapse mt-3" id="collapsePeringatan">
+        <hr>
+        <ul>
+            {% for laporan in laporan_terlambat %}
+            <li>
+                <a href="{{ url_for('tindak_lanjut', laporan_id=laporan.id) }}" class="alert-link">
+                    Laporan #{{ laporan.id }}: {{ laporan.judul }} (Diterima pada {{ laporan.timestamp.split(' ')[0] }})
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endif %}
+
+
+<!-- Formulir Filter -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" action="{{ url_for('admin_dashboard') }}">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label for="kategori" class="form-label">Kategori</label>
+                    <select class="form-select" name="kategori">
+                        <option value="">Semua Kategori</option>
+                        {% for kat in kategori_options %}
+                        <option value="{{ kat }}" {% if filters.kategori == kat %}selected{% endif %}>{{ kat }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="kecamatan" class="form-label">Kecamatan</label>
+                    <select name="kecamatan" id="kecamatan" class="form-select">
+                        <option value="">Semua Kecamatan</option>
+                        {% for kec in kecamatan_options %}
+                        <option value="{{ kec }}" {% if filters.kecamatan == kec %}selected{% endif %}>{{ kec }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="status" class="form-label">Status</label>
+                    <select name="status" id="status" class="form-select">
+                        <option value="">Semua Status</option>
+                        <option value="Diterima" {% if filters.status == 'Diterima' %}selected{% endif %}>Diterima
+                        </option>
+                        <option value="Diproses" {% if filters.status == 'Diproses' %}selected{% endif %}>Diproses
+                        </option>
+                        <option value="Selesai" {% if filters.status == 'Selesai' %}selected{% endif %}>Selesai</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary w-100">Filter</button>
+                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary w-100 mt-2">Reset</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Tabel Manajemen Laporan -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        Manajemen Laporan Masuk
+        <button type="submit" form="delete-form" class="btn btn-danger btn-sm" id="delete-btn" disabled>Hapus Laporan
+            Terpilih</button>
+    </div>
+    <div class="card-body">
+        <form method="post" action="{{ url_for('delete_reports') }}" id="delete-form"
+            onsubmit="return confirm('Anda yakin ingin menghapus laporan yang dipilih? Aksi ini tidak dapat dibatalkan.');">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" id="select-all"></th>
+                            <th>ID</th>
+                            <th>No. Laporan</th>
+                            <th>Judul</th>
+                            <th>
+                                {% set sort_order = 'ASC' if filters.sort_by == 'kategori' and filters.order == 'DESC' else 'DESC' %}
+                                {% set params = request.args.to_dict() %}
+                                {% set _ = params.update({'sort_by': 'kategori', 'order': sort_order}) %}
+                                <a href="{{ url_for('admin_dashboard', **params) }}">Kategori</a>
+                            </th>
+                            <th>
+                                {% set sort_order = 'ASC' if filters.sort_by == 'timestamp' and filters.order == 'DESC' else 'DESC' %}
+                                {% set params = request.args.to_dict() %}
+                                {% set _ = params.update({'sort_by': 'timestamp', 'order': sort_order}) %}
+                                <a href="{{ url_for('admin_dashboard', **params) }}">Tanggal</a>
+                            </th>
+                            <th>
+                                {% set sort_order = 'ASC' if filters.sort_by == 'status' and filters.order == 'DESC' else 'DESC' %}
+                                {% set params = request.args.to_dict() %}
+                                {% set _ = params.update({'sort_by': 'status', 'order': sort_order}) %}
+                                <a href="{{ url_for('admin_dashboard', **params) }}">Status</a>
+                            </th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for laporan in laporan_list %}
+                        <tr>
+                            <td><input type="checkbox" name="selected_reports" value="{{ laporan.id }}"
+                                    class="report-checkbox"></td>
+                            <td>{{ laporan.id }}</td>
+                            <td><strong>{{ laporan.nomor_laporan }}</strong></td>
+                            <td>{{ laporan.judul }}</td>
+                            <td>{{ laporan.nama_kategori }}</td>
+                            <!-- =============================================================== -->
+                            <!-- PERBAIKAN DI SINI: Menggunakan split() untuk mengambil tanggal -->
+                            <!-- =============================================================== -->
+                            <td>{{ laporan.timestamp.split(' ')[0] }}</td>
+                            <td>
+                                {% if laporan.status == 'Diterima' %}
+                                <span class="badge bg-warning">{{ laporan.status }}</span>
+                                {% elif laporan.status == 'Diproses' %}
+                                <span class="badge bg-info">{{ laporan.status }}</span>
+                                {% else %}
+                                <span class="badge bg-success">{{ laporan.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ url_for('tindak_lanjut', laporan_id=laporan.id) }}"
+                                    class="btn btn-primary btn-sm">Tindak Lanjut</a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="8" class="text-center">Tidak ada laporan yang cocok dengan filter Anda.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const selectAll = document.getElementById('select-all');
+    const checkboxes = document.querySelectorAll('.report-checkbox');
+    const deleteBtn = document.getElementById('delete-btn');
+
+    function toggleDeleteButton() {
+        const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
+        deleteBtn.disabled = !anyChecked;
+    }
+
+    selectAll.addEventListener('change', function() {
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+        toggleDeleteButton();
+    });
+
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            if (!this.checked) {
+                selectAll.checked = false;
+            }
+            toggleDeleteButton();
+        });
+    });
+});
+</script>
+{% endblock %}
