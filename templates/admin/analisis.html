@@ -1,367 +1,428 @@
-{% extends "admin/layout.html" %}
-{% block title %}Analisis Data{% endblock %}
-{% block page_title %}Halaman Analisis Data Laporan{% endblock %}
-
-{% block content %}
+{% extends "admin/layout.html" %} {% block title %}Analisis Data{% endblock %} {% block page_title %}Halaman Analisis Data Laporan{% endblock %} {% block content %}
 <div class="card mb-4">
-    <div class="card-body">
-        <form method="get" action="{{ url_for('analisis') }}">
-            <div class="row g-3 align-items-end">
-                <div class="col-md-4">
-                    <label for="start_date" class="form-label fw-semibold">Tanggal Mulai</label>
-                    <input type="date" name="start_date" id="start_date" class="form-control" value="{{ filters.start_date or '' }}">
-                </div>
-                <div class="col-md-4">
-                    <label for="end_date" class="form-label fw-semibold">Tanggal Akhir</label>
-                    <input type="date" name="end_date" id="end_date" class="form-control" value="{{ filters.end_date or '' }}">
-                </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="bi bi-funnel-fill"></i> Terapkan
-                    </button>
-                </div>
-                <div class="col-md-2">
-                    <a href="{{ url_for('analisis') }}" class="btn btn-secondary w-100">
-                       <i class="bi bi-arrow-clockwise"></i> Reset
-                    </a>
-                </div>
-            </div>
-        </form>
-    </div>
+     <div class="card-body">
+          <form method="get" action="{{ url_for('analisis') }}">
+               <div class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                         <label for="start_date" class="form-label fw-semibold">Tanggal Mulai</label>
+                         <input type="date" name="start_date" id="start_date" class="form-control" value="{{ filters.start_date or '' }}" />
+                    </div>
+                    <div class="col-md-4">
+                         <label for="end_date" class="form-label fw-semibold">Tanggal Akhir</label>
+                         <input type="date" name="end_date" id="end_date" class="form-control" value="{{ filters.end_date or '' }}" />
+                    </div>
+                    <div class="col-md-2">
+                         <button type="submit" class="btn btn-primary w-100"><i class="bi bi-funnel-fill"></i> Terapkan</button>
+                    </div>
+                    <div class="col-md-2">
+                         <a href="{{ url_for('analisis') }}" class="btn btn-secondary w-100"> <i class="bi bi-arrow-clockwise"></i> Reset </a>
+                    </div>
+               </div>
+          </form>
+     </div>
 </div>
 
 {% if results and results.total_laporan > 0 %}
 <div class="row g-4 dashboard-grid">
+     <div class="col-xl-8">
+          <div class="row g-4">
+               <div class="col-12">
+                    <div class="card">
+                         <div class="card-header">
+                              <h5 class="mb-0">📊 Tren Laporan per Bulan (per Kategori)</h5>
+                         </div>
+                         <div class="card-body">
+                              <canvas id="monthlyTrendChart" style="height: 220px"></canvas>
+                         </div>
+                    </div>
+               </div>
+               <div class="col-12">
+                    <div class="card">
+                         <div class="card-header">
+                              <h5 class="mb-0">📍 Laporan per Kecamatan</h5>
+                         </div>
+                         <div class="card-body">
+                              <canvas id="kecamatanChart" style="height: 220px"></canvas>
+                         </div>
+                    </div>
+               </div>
+          </div>
+     </div>
 
-    <div class="col-xl-8">
-        <div class="row g-4">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">📊 Tren Laporan per Bulan (per Kategori)</h5>
+     <div class="col-xl-4">
+          <div class="row g-4">
+               <div class="col-12">
+                    <div class="card">
+                         <div class="card-header d-flex justify-content-between align-items-center">
+                              <h5 class="mb-0">📌 Laporan per Kategori</h5>
+                              <a href="{{ url_for('download_csv', data_type='kategori', start_date=filters.start_date, end_date=filters.end_date) }}" class="btn btn-sm btn-outline-light">CSV</a>
+                         </div>
+                         <div class="card-body">
+                              <canvas id="categoryChart" style="height: 220px"></canvas>
+                         </div>
                     </div>
-                    <div class="card-body">
-                        <canvas id="monthlyTrendChart" style="height: 220px"></canvas>
+               </div>
+               <div class="col-12">
+                    <div class="card">
+                         <div class="card-header d-flex justify-content-between align-items-center">
+                              <h5 class="mb-0">📁 Laporan per Status</h5>
+                              <a href="{{ url_for('download_csv', data_type='status', start_date=filters.start_date, end_date=filters.end_date) }}" class="btn btn-sm btn-outline-light">CSV</a>
+                         </div>
+                         <div class="card-body">
+                              <canvas id="statusChart" style="height: 220px"></canvas>
+                         </div>
                     </div>
-                </div>
-            </div>
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">📍 Laporan per Kecamatan</h5>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="kecamatanChart" style="height: 220px"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-xl-4">
-        <div class="row g-4">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">📌 Laporan per Kategori</h5>
-                        <a href="{{ url_for('download_csv', data_type='kategori', start_date=filters.start_date, end_date=filters.end_date) }}" class="btn btn-sm btn-outline-light">CSV</a>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="categoryChart" style="height: 220px"></canvas>
-                    </div>
-                </div>
-            </div>
-             <div class="col-12">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">📁 Laporan per Status</h5>
-                         <a href="{{ url_for('download_csv', data_type='status', start_date=filters.start_date, end_date=filters.end_date) }}" class="btn btn-sm btn-outline-light">CSV</a>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="statusChart" style="height: 220px"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+               </div>
+          </div>
+     </div>
 </div>
 
 <div class="row g-4 mt-1">
-    <div class="col-lg-8">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">🗺️ Peta Sebaran Masalah</h5>
-            </div>
-            <div class="card-body p-0">
-                <div class="p-3 border-bottom d-flex flex-wrap justify-content-between align-items-center gap-2">
-                     <div class="d-flex flex-wrap gap-2">
-                        {% for item in results.stats_by_category %}
-                        <div class="form-check form-check-inline mb-0">
-                            <input class="form-check-input category-filter" type="checkbox" value="{{ item.kategori }}" id="cat-{{ loop.index }}" checked>
-                            <label class="form-check-label small" for="cat-{{ loop.index }}">{{ item.kategori }}</label>
-                        </div>
-                        {% endfor %}
+     <div class="col-lg-8">
+          <div class="card">
+               <div class="card-header">
+                    <h5 class="mb-0">🗺️ Peta Sebaran Masalah</h5>
+               </div>
+               <div class="card-body p-0">
+                    <div class="p-3 border-bottom d-flex flex-wrap justify-content-between align-items-center gap-2">
+                         <div class="d-flex flex-wrap gap-2">
+                              {% for item in results.stats_by_category %}
+                              <div class="form-check form-check-inline mb-0">
+                                   <input class="form-check-input category-filter" type="checkbox" value="{{ item.kategori }}" id="cat-{{ loop.index }}" checked />
+                                   <label class="form-check-label small" for="cat-{{ loop.index }}">{{ item.kategori }}</label>
+                              </div>
+                              {% endfor %}
+                         </div>
+                         <div>
+                              <button id="toggleCluster" class="btn btn-sm btn-primary">Clustering</button>
+                              <button id="toggleHeatmap" class="btn btn-sm btn-outline-danger ms-2">Heatmap</button>
+                         </div>
                     </div>
-                    <div>
-                        <button id="toggleCluster" class="btn btn-sm btn-primary">Clustering</button>
-                        <button id="toggleHeatmap" class="btn btn-sm btn-outline-danger ms-2">Heatmap</button>
-                    </div>
-                </div>
-                <div id="categoryMap" style="height: 400px; border-radius: 0 0 12px 12px;"></div>
-            </div>
-        </div>
-    </div>
+                    <div id="categoryMap" style="height: 400px; border-radius: 0 0 12px 12px"></div>
+               </div>
+          </div>
+     </div>
      <div class="col-lg-4">
-         <div class="card h-100">
-            <div class="card-header">
-                <h5 class="mb-0">☁️ Word Cloud Laporan</h5>
-            </div>
-            <div class="card-body text-center d-flex align-items-center justify-content-center">
-                <canvas id="wordCloudCanvas" width="400" height="400"></canvas>
-            </div>
-        </div>
-    </div>
+          <div id="carouselId" class="carousel slide" data-bs-ride="carousel">
+               <ol class="carousel-indicators">
+                    <li data-bs-target="#carouselId" data-bs-slide-to="0" class="active" aria-current="true" aria-label="First slide"></li>
+                    <li data-bs-target="#carouselId" data-bs-slide-to="1" aria-label="Second slide"></li>
+                    <li data-bs-target="#carouselId" data-bs-slide-to="2" aria-label="Third slide"></li>
+               </ol>
+               <div class="carousel-inner h-100" role="listbox">
+                    <div class="carousel-item active">
+                         <div class="card h-100">
+                              <div class="card-header">
+                                   <h5 class="mb-0">☁️ Word Cloud Laporan</h5>
+                              </div>
+                              <div class="card-body text-center d-flex align-items-center justify-content-center">
+                                   <canvas id="wordCloudCanvas" width="400" height="400"></canvas>
+                              </div>
+                         </div>
+                    </div>
+                    <div class="carousel-item">
+                         <div class="card h-100">
+                              <div class="card-header"><h5 class="mb-0">😡 WordCloud Sentimen Negatif</h5></div>
+                              <div class="card-body text-center d-flex align-items-center justify-content-center">
+                                   <canvas id="wordCloudNegatif" width="400" height="400"></canvas>
+                              </div>
+                         </div>
+                    </div>
+                    <div class="carousel-item">
+                         <div class="card h-100">
+                              <div class="card-header"><h5 class="mb-0">😊 WordCloud Sentimen Positif</h5></div>
+                              <div class="card-body text-center d-flex align-items-center justify-content-center">
+                                   <canvas id="wordCloudPositif" width="400" height="400"></canvas>
+                              </div>
+                         </div>
+                    </div>
+               </div>
+               <button class="carousel-control-prev" type="button" data-bs-target="#carouselId" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+               </button>
+               <button class="carousel-control-next" type="button" data-bs-target="#carouselId" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+               </button>
+          </div>
+          <!-- <div class="card h-100">
+               <div class="card-header">
+                    <h5 class="mb-0">☁️ Word Cloud Laporan</h5>
+               </div>
+               <div class="card-body text-center d-flex align-items-center justify-content-center">
+                    <canvas id="wordCloudCanvas" width="400" height="400"></canvas>
+               </div>
+          </div> -->
+     </div>
 </div>
 
 {% else %}
 <div class="alert alert-info">
-    {% if filters.start_date or filters.end_date %}
-        Tidak ada data laporan yang ditemukan untuk rentang tanggal yang dipilih.
-    {% else %}
-        Silakan pilih rentang tanggal dan klik <strong>"Terapkan"</strong> untuk memulai analisis.
-    {% endif %}
+     {% if filters.start_date or filters.end_date %} Tidak ada data laporan yang ditemukan untuk rentang tanggal yang dipilih. {% else %} Silakan pilih rentang tanggal dan klik <strong>"Terapkan"</strong> untuk memulai analisis. {% endif %}
 </div>
-{% endif %}
-{% endblock %}
-
-{% block scripts %}
-{{ super() }}
+{% endif %} {% endblock %} {% block scripts %} {{ super() }}
 <script src="https://cdn.jsdelivr.net/npm/wordcloud@1.2.2/src/wordcloud2.min.js"></script>
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Ambil data JSON yang dikirim dari Flask
-    const results = {{ results | tojson | safe }};
+          document.addEventListener('DOMContentLoaded', function() {
+            // Ambil data JSON yang dikirim dari Flask
+            const results = {{ results | tojson | safe }};
 
-    // Hanya jalankan script jika ada data laporan
-    if (results && results.total_laporan > 0) {
-      
-      /* ===========================
-         CHART TREND LAPORAN BULANAN
-         =========================== */
-      const monthlyTrendCtx = document.getElementById('monthlyTrendChart').getContext('2d');
-      const trendData = results.monthly_trends;
-      
-      // Ambil datasets yang sudah disiapkan oleh backend
-      const datasets = trendData.datasets;
-      
-      // Hitung total laporan per bulan untuk membuat garis 'Total'
-      let totalLaporanPerBulan = new Array(trendData.labels.length).fill(0);
-      datasets.forEach(ds => {
-        ds.type = 'bar'; // Pastikan tipe chart adalah bar untuk tumpukan
-        ds.data.forEach((val, idx) => totalLaporanPerBulan[idx] += val);
-      });
+            // Hanya jalankan script jika ada data laporan
+            if (results && results.total_laporan > 0) {
 
-      // Tambahkan dataset baru untuk garis 'Total Laporan'
-      datasets.push({
-        type: 'line',
-        label: 'Total Laporan',
-        data: totalLaporanPerBulan,
-        borderColor: '#343a40',
-        backgroundColor: 'rgba(52, 58, 64, 0.1)',
-        tension: 0.2,
-        fill: true
-      });
-      
-      new Chart(monthlyTrendCtx, {
-        data: { 
-          labels: trendData.labels, 
-          datasets: datasets 
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { 
-            legend: { position: 'top' } 
-          },
-          scales: { 
-            x: { stacked: true }, 
-            y: { stacked: true, beginAtZero: true } 
-          }
-        }
-      });
+              /* ===========================
+                 CHART TREND LAPORAN BULANAN
+                 =========================== */
+              const monthlyTrendCtx = document.getElementById('monthlyTrendChart').getContext('2d');
+              const trendData = results.monthly_trends;
 
-      /* ===========================
-         CHART LAPORAN PER KATEGORI
-         =========================== */
-      const categoryCtx = document.getElementById('categoryChart').getContext('2d');
-      const categoryData = results.stats_by_category;
-      
-      new Chart(categoryCtx, {
-        type: 'bar',
-        data: {
-          // Ambil label, jumlah, dan warna dari struktur data baru
-          labels: categoryData.map(item => item.kategori),
-          datasets: [{
-            label: 'Jumlah Laporan',
-            data: categoryData.map(item => item.jumlah),
-            backgroundColor: categoryData.map(item => item.warna)
-          }]
-        },
-        options: { 
-          indexAxis: 'y', 
-          responsive: true, 
-          maintainAspectRatio: false,
-          plugins: { 
-            legend: { display: false } 
-          } 
-        }
-      });
+              // Ambil datasets yang sudah disiapkan oleh backend
+              const datasets = trendData.datasets;
 
-      /* ===========================
-         CHART LAPORAN PER STATUS
-         =========================== */
-      const statusCtx = document.getElementById('statusChart').getContext('2d');
-      new Chart(statusCtx, {
-        type: 'pie',
-        data: {
-          labels: Object.keys(results.stats_by_status),
-          datasets: [{
-            data: Object.values(results.stats_by_status),
-            backgroundColor: ['#ffc107', '#0dcaf0', '#198754'] // Warna untuk Diterima, Diproses, Selesai
-          }]
-        },
-        options: { 
-          responsive: true, 
-          maintainAspectRatio: false,
-          plugins: { 
-            legend: { position: 'top' } 
-          } 
-        }
-      });
+              // Hitung total laporan per bulan untuk membuat garis 'Total'
+              let totalLaporanPerBulan = new Array(trendData.labels.length).fill(0);
+              datasets.forEach(ds => {
+                ds.type = 'bar'; // Pastikan tipe chart adalah bar untuk tumpukan
+                ds.data.forEach((val, idx) => totalLaporanPerBulan[idx] += val);
+              });
 
-      /* ===========================
-         CHART LAPORAN PER KECAMATAN
-         =========================== */
-      const kecamatanCtx = document.getElementById('kecamatanChart').getContext('2d');
-      new Chart(kecamatanCtx, {
-        type: 'bar',
-        data: {
-          labels: Object.keys(results.stats_by_kecamatan),
-          datasets: [{
-            label: 'Jumlah Laporan',
-            data: Object.values(results.stats_by_kecamatan),
-            backgroundColor: '#0d6efd'
-          }]
-        },
-        options: { 
-          responsive: true, 
-          maintainAspectRatio: false,
-          plugins: { 
-            legend: { display: false } 
-          } 
-        }
-      });
+              // Tambahkan dataset baru untuk garis 'Total Laporan'
+              datasets.push({
+                type: 'line',
+                label: 'Total Laporan',
+                data: totalLaporanPerBulan,
+                borderColor: '#343a40',
+                backgroundColor: 'rgba(52, 58, 64, 0.1)',
+                tension: 0.2,
+                fill: true
+              });
 
-      /* ===========================
-         PETA SEBARAN MASALAH
-         =========================== */
-      var map = L.map('categoryMap').setView([-5.42, 105.26], 12);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors'
-      }).addTo(map);
+              new Chart(monthlyTrendCtx, {
+                data: {
+                  labels: trendData.labels,
+                  datasets: datasets
+                },
+                options: {
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                    legend: { position: 'top' }
+                  },
+                  scales: {
+                    x: { stacked: true },
+                    y: { stacked: true, beginAtZero: true }
+                  }
+                }
+              });
 
-      // Buat pemetaan warna dari data dinamis untuk digunakan di peta
-      const geoData = results.geospatial_analysis;
-      const dynamicCategoryColors = {};
-      results.stats_by_category.forEach(item => {
-        dynamicCategoryColors[item.kategori] = item.warna;
-      });
-      
-      var markerClusterGroup = L.markerClusterGroup();
+              /* ===========================
+                 CHART LAPORAN PER KATEGORI
+                 =========================== */
+              const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+              const categoryData = results.stats_by_category;
 
-      function updateMarkers() {
-        markerClusterGroup.clearLayers();
-        for (const category in geoData) {
-          if (document.querySelector(`.category-filter[value="${category}"]`).checked) {
-            geoData[category].forEach(function(p) {
-              var marker = L.circleMarker([p.latitude, p.longitude], {
-                radius: 6,
-                fillColor: dynamicCategoryColors[category] || 'grey',
-                color: "#000",
-                weight: 0.5,
-                opacity: 1,
-                fillOpacity: 0.8
-              }).bindPopup(`<strong>${category}</strong>`);
-              markerClusterGroup.addLayer(marker);
-            });
-          }
-        }
-      }
-      updateMarkers();
-      map.addLayer(markerClusterGroup);
+              new Chart(categoryCtx, {
+                type: 'bar',
+                data: {
+                  // Ambil label, jumlah, dan warna dari struktur data baru
+                  labels: categoryData.map(item => item.kategori),
+                  datasets: [{
+                    label: 'Jumlah Laporan',
+                    data: categoryData.map(item => item.jumlah),
+                    backgroundColor: categoryData.map(item => item.warna)
+                  }]
+                },
+                options: {
+                  indexAxis: 'y',
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                    legend: { display: false }
+                  }
+                }
+              });
 
-      document.querySelectorAll('.category-filter').forEach(cb => cb.addEventListener('change', updateMarkers));
+              /* ===========================
+                 CHART LAPORAN PER STATUS
+                 =========================== */
+              const statusCtx = document.getElementById('statusChart').getContext('2d');
+              new Chart(statusCtx, {
+                type: 'pie',
+                data: {
+                  labels: Object.keys(results.stats_by_status),
+                  datasets: [{
+                    data: Object.values(results.stats_by_status),
+                    backgroundColor: ['#ffc107', '#0dcaf0', '#198754'] // Warna untuk Diterima, Diproses, Selesai
+                  }]
+                },
+                options: {
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                    legend: { position: 'top' }
+                  }
+                }
+              });
 
-      // --- Logika Heatmap & Clustering ---
-      var heatmapPoints = [];
-      for (const category in geoData) {
-        geoData[category].forEach(p => heatmapPoints.push([p.latitude, p.longitude, 0.6]));
-      }
-      var heatLayer = L.heatLayer(heatmapPoints, {
-        radius: 30, blur: 15, maxZoom: 17,
-        gradient: { 0.3: "#00bfff", 0.6: "#ffc107", 1.0: "#dc3545" }
-      });
+              /* ===========================
+                 CHART LAPORAN PER KECAMATAN
+                 =========================== */
+              const kecamatanCtx = document.getElementById('kecamatanChart').getContext('2d');
+              new Chart(kecamatanCtx, {
+                type: 'bar',
+                data: {
+                  labels: Object.keys(results.stats_by_kecamatan),
+                  datasets: [{
+                    label: 'Jumlah Laporan',
+                    data: Object.values(results.stats_by_kecamatan),
+                    backgroundColor: '#0d6efd'
+                  }]
+                },
+                options: {
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                    legend: { display: false }
+                  }
+                }
+              });
 
-      let heatmapActive = false;
-      document.getElementById('toggleHeatmap').addEventListener('click', function() {
-        if (heatmapActive) {
-          map.removeLayer(heatLayer);
-          this.classList.remove('btn-danger');
-          this.classList.add('btn-outline-danger');
-        } else {
-          map.addLayer(heatLayer);
-          this.classList.add('btn-danger');
-          this.classList.remove('btn-outline-danger');
-        }
-        heatmapActive = !heatmapActive;
-      });
+              /* ===========================
+                 PETA SEBARAN MASALAH
+                 =========================== */
+              var map = L.map('categoryMap').setView([-5.42, 105.26], 12);
+              L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+              }).addTo(map);
 
-      let clusterActive = true;
-      document.getElementById('toggleCluster').addEventListener('click', function() {
-        if (clusterActive) {
-          map.removeLayer(markerClusterGroup);
-          this.classList.remove('btn-primary');
-          this.classList.add('btn-outline-primary');
-        } else {
-          map.addLayer(markerClusterGroup);
-          this.classList.add('btn-primary');
-          this.classList.remove('btn-outline-primary');
-        }
-        clusterActive = !clusterActive;
-      });
+              // Buat pemetaan warna dari data dinamis untuk digunakan di peta
+              const geoData = results.geospatial_analysis;
+              const dynamicCategoryColors = {};
+              results.stats_by_category.forEach(item => {
+                dynamicCategoryColors[item.kategori] = item.warna;
+              });
 
-      /* ===========================
-         WORD CLOUD
-         =========================== */
-      const wordData = [];
-      for (const category in results.text_analysis) {
-        results.text_analysis[category].forEach(keyword => {
-          wordData.push([keyword, Math.floor(Math.random() * 40) + 10]);
-        });
-      }
+              var markerClusterGroup = L.markerClusterGroup();
 
-      if(wordData.length > 0) {
-        WordCloud(document.getElementById('wordCloudCanvas'), {
-          list: wordData,
-          gridSize: 8,
-          weightFactor: 3,
-          fontFamily: 'Verdana, sans-serif',
-          color: 'random-dark',
-          backgroundColor: 'transparent',
-          rotateRatio: 0.5
-        });
-      }
-    }
-  });
+              function updateMarkers() {
+                markerClusterGroup.clearLayers();
+                for (const category in geoData) {
+                  if (document.querySelector(`.category-filter[value="${category}"]`).checked) {
+                    geoData[category].forEach(function(p) {
+                      var marker = L.circleMarker([p.latitude, p.longitude], {
+                        radius: 6,
+                        fillColor: dynamicCategoryColors[category] || 'grey',
+                        color: "#000",
+                        weight: 0.5,
+                        opacity: 1,
+                        fillOpacity: 0.8
+                      }).bindPopup(`<strong>${category}</strong>`);
+                      markerClusterGroup.addLayer(marker);
+                    });
+                  }
+                }
+              }
+              updateMarkers();
+              map.addLayer(markerClusterGroup);
+
+              document.querySelectorAll('.category-filter').forEach(cb => cb.addEventListener('change', updateMarkers));
+
+              // --- Logika Heatmap & Clustering ---
+              var heatmapPoints = [];
+              for (const category in geoData) {
+                geoData[category].forEach(p => heatmapPoints.push([p.latitude, p.longitude, 0.6]));
+              }
+              var heatLayer = L.heatLayer(heatmapPoints, {
+                radius: 30, blur: 15, maxZoom: 17,
+                gradient: { 0.3: "#00bfff", 0.6: "#ffc107", 1.0: "#dc3545" }
+              });
+
+              let heatmapActive = false;
+              document.getElementById('toggleHeatmap').addEventListener('click', function() {
+                if (heatmapActive) {
+                  map.removeLayer(heatLayer);
+                  this.classList.remove('btn-danger');
+                  this.classList.add('btn-outline-danger');
+                } else {
+                  map.addLayer(heatLayer);
+                  this.classList.add('btn-danger');
+                  this.classList.remove('btn-outline-danger');
+                }
+                heatmapActive = !heatmapActive;
+              });
+
+              let clusterActive = true;
+              document.getElementById('toggleCluster').addEventListener('click', function() {
+                if (clusterActive) {
+                  map.removeLayer(markerClusterGroup);
+                  this.classList.remove('btn-primary');
+                  this.classList.add('btn-outline-primary');
+                } else {
+                  map.addLayer(markerClusterGroup);
+                  this.classList.add('btn-primary');
+                  this.classList.remove('btn-outline-primary');
+                }
+                clusterActive = !clusterActive;
+              });
+
+              /* ===========================
+                 WORD CLOUD
+                 =========================== */
+              const wordData = [];
+              for (const category in results.text_analysis) {
+                results.text_analysis[category].forEach(keyword => {
+                  wordData.push([keyword, Math.floor(Math.random() * 40) + 10]);
+                });
+              }
+
+              if(wordData.length > 0) {
+                WordCloud(document.getElementById('wordCloudCanvas'), {
+                  list: wordData,
+                  gridSize: 8,
+                  weightFactor: 3,
+                  fontFamily: 'Verdana, sans-serif',
+                  color: 'random-dark',
+                  backgroundColor: 'transparent',
+                  rotateRatio: 0.5
+                });
+              }
+            }
+
+     const positifData = {{ results.sentiment_wordcloud.positif | tojson | safe }};
+     const negatifData = {{ results.sentiment_wordcloud.negatif | tojson | safe }};
+
+     // WordCloud Positif
+     if (positifData.length > 0) {
+         WordCloud(document.getElementById('wordCloudPositif'), {
+             list: positifData,
+             gridSize: 8,
+             weightFactor: 3,
+             fontFamily: 'Verdana, sans-serif',
+             color: 'random-dark',
+             backgroundColor: 'transparent',
+             rotateRatio: 0.5
+         });
+     } else {
+         console.log("Tidak ada data sentimen positif");
+     }
+
+     // WordCloud Negatif
+     if (negatifData.length > 0) {
+         WordCloud(document.getElementById('wordCloudNegatif'), {
+             list: negatifData,
+             gridSize: 8,
+             weightFactor: 3,
+             fontFamily: 'Verdana, sans-serif',
+             color: 'random-dark',
+             backgroundColor: 'transparent',
+             rotateRatio: 0.5
+         });
+     } else {
+         console.log("Tidak ada data sentimen negatif");
+     }
+
+
+          });
 </script>
 {% endblock %}

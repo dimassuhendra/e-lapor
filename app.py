@@ -93,14 +93,31 @@ def seed_db_command():
     
     def buat_deskripsi_indonesia(kategori_nama):
         templates = [
-            f"Saya melihat ada masalah {kategori_nama} di dekat {fake.street_name()}. Mohon bantuannya.",
-            f"Tolong segera ditindaklanjuti, ada {kategori_nama} di wilayah {fake.city()}.",
-            f"Laporan mengenai {kategori_nama}. Lokasinya persis di depan {fake.company()}.",
+            f"Lapor, saya menemukan masalah {kategori_nama} di jalan {fake.street_name()} tepat di depan toko {fake.company()}. Kondisinya sangat mengganggu mobilitas dan sudah berlangsung selama beberapa hari terakhir.",
+            f"Mohon perhatiannya, ada {kategori_nama} yang sudah sangat parah di wilayah {fake.city()}. Hal ini bisa membahayakan pengguna jalan atau warga yang melintas, jadi saya harap bisa segera diperbaiki.",
+            f"Ini kok masalah {kategori_nama} di sekitar {fake.street_name()} tidak pernah ada perbaikan? Setiap kali lewat selalu kesulitan. Tolong segera ditindaklanjuti, jangan sampai ada korban.",
+            f"Saya melaporkan adanya {kategori_nama} yang lokasinya persis di depan kantor {fake.company()}. Sepertinya sudah cukup lama dan tidak ada tanda-tanda perbaikan, sangat mengganggu pemandangan dan aktivitas kami.",
+            f"Sudah berkali-kali ada laporan tentang {kategori_nama} di daerah {fake.city()} ini, tapi kok tidak ada tindakan nyata ya? Kalau begini terus, kita sebagai warga juga yang rugi.",
+            f"Tolong segera ditindak, ada {kategori_nama} di sekitar {fake.street_name()}. Ini adalah masalah serius yang bisa berakibat fatal kalau dibiarkan terlalu lama, jadi jangan dianggap remeh.",
+            f"Saya sebagai warga {fake.city()} merasa sangat kecewa dengan kondisi {kategori_nama} yang semakin memburuk. Kalau memang tidak ada dana, ya informasikan, jangan didiamkan begitu saja.",
+            f"Melalui aplikasi ini saya laporkan kondisi {kategori_nama} di {fake.street_name()} yang lokasinya di dekat {fake.company()}. Saya berharap laporan ini tidak diabaikan dan bisa langsung diatasi secepatnya.",
+            f"Kondisi {kategori_nama} di lingkungan {fake.city()} ini sungguh memprihatinkan dan sangat tidak layak. Saya meminta pemerintah setempat untuk segera turun tangan dan menyelesaikan masalah ini.",
+            f"Gara-gara {kategori_nama} ini, perjalanan saya setiap hari jadi terhambat. Lokasinya ada di {fake.street_name()}. Saya mohon dengan sangat agar segera diperbaiki sebelum masalahnya semakin melebar.",
+            f"Pusing banget lihat {kategori_nama} di {fake.street_name()} yang enggak selesai-selesai. Pemerintahnya kerja apa anjing?",
+            f"Jalanan di {fake.city()} ini kayaknya beneran dikorupsi, masa {kategori_nama} yang segini parah dibiarin aja? Tolong lah, masa nunggu ada korban dulu.",
+            f"Saya curiga dana untuk perbaikan {kategori_nama} ini sudah dikorupsi. Lokasi tepatnya di {fake.street_name()}. Tolong diinvestigasi, jangan tutup mata!",
+            f"Woy, ada {kategori_nama} di {fake.street_name()} nih. Kalo dibiarin terus, orang bisa mati kecelakaan. Pemerintah goblok!",
+            f"Ini benar-benar parah, ada {kategori_nama} di {fake.city()} yang sudah merusak banyak kendaraan. Kapan kalian mau kerja, hah?",
+            f"Lapor, {kategori_nama} di {fake.street_name()} sudah sangat mengganggu. Jalannya hancur kayak muka lo, buruan diperbaiki!",
+            f"Gue sumpahin yang korupsi duit buat perbaiki {kategori_nama} ini masuk neraka. Lokasinya di {fake.city()}, sudah sangat meresahkan.",
+            f"Sudah capek laporin {kategori_nama} di {fake.street_name()} tapi tidak ada tanggapan. Sebenarnya kalian peduli nggak sih sama rakyat?",
+            f"Ada {kategori_nama} di {fake.street_name()} yang bikin perjalanan jadi lama. Jangan pura-pura buta anjing kau, ini sudah masalah besar!",
+            f"Anjrit, {kategori_nama} di {fake.city()} ini sudah kayak neraka. Kapan pemerintah mau gerak buat benerin, hah? Jangan cuma tidur aja!"
         ]
         return random.choice(templates)
 
-    print("Menambahkan 300 data laporan palsu...")
-    for i in range(300):
+    print("Menambahkan 1000 data laporan palsu...")
+    for i in range(1000):
         kecamatan_name = random.choice(list(KODE_KECAMATAN.keys()))
         
         kategori_terpilih = random.choice(kategori_list)

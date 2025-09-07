@@ -91,6 +91,8 @@ CREATE TABLE nomor_laporan_harian (
 -- == DATA AWAL =====
 -- ==================
 
+
+
 -- Mengisi tabel dinas dengan data awal
 INSERT INTO dinas (nama_dinas, kontak) VALUES
 ('Dinas Pekerjaan Umum', '6281234567890'),

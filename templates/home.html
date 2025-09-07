@@ -1,170 +1,161 @@
-{% extends "layout.html" %}
-
-{% block title %}Dashboard Publik Lapor!{% endblock %}
-
-{% block content %}
+{% extends "layout.html" %} {% block title %}Dashboard Publik Lapor!{% endblock %} {% block content %}
 <div class="text-center mb-5">
-    <h1 class="display-5 fw-bold">Dashboard Pelaporan Publik</h1>
-    <p class="lead text-muted">Pantau laporan warga dan pengumuman terbaru dari Pemerintah Kota Bandar Lampung.</p>
+     <h1 class="display-5 fw-bold">Dashboard Pelaporan Publik</h1>
+     <p class="lead text-muted">Pantau laporan warga dan pengumuman terbaru dari Pemerintah Kota Bandar Lampung.</p>
 </div>
 
 <div class="row g-4">
-    <div class="col-lg-3">
-        <h4 class="mb-3"><i class="bi bi-list-ul me-2"></i>Laporan Terbaru</h4>
-        <div class="list-group shadow-sm listlaporan">
-            {% for laporan in paginated_laporan_list %}
-            <a href="{{ url_for('detail_laporan', laporan_id=laporan.id) }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-start">
-                <div class="ms-2 me-auto">
-                    <div class="fw-bold">{{ laporan.judul }}</div>
-                    <small class="text-muted"><i class="bi bi-clock me-1"></i>{{ laporan.timestamp.split(' ')[0] }}</small>
-                </div>
-                <span class="badge 
-                    {% if laporan.status == 'Diterima' %}text-bg-warning
-                    {% elif laporan.status == 'Diproses' %}text-bg-primary
-                    {% elif laporan.status == 'Selesai' %}text-bg-success
-                    {% else %}text-bg-secondary
-                    {% endif %}
-                    rounded-pill" style="font-size: 0.75rem;">{{ laporan.status }}</span>
-            </a>
-            {% else %}
-            <div class="list-group-item text-center text-muted">Belum ada laporan.</div>
-            {% endfor %}
-        </div>
-        
-        {% if laporan_pagination.total_pages > 1 %}
-        <nav class="mt-3">
-            <ul class="pagination pagination-sm justify-content-center">
-                <li class="page-item {% if laporan_pagination.page == 1 %}disabled{% endif %}">
-                    <a class="page-link" href="{{ url_for('index', laporan_page=laporan_pagination.page - 1, pengumuman_page=pengumuman_pagination.page) }}">&laquo;</a>
-                </li>
-                <li class="page-item active">
-                    <span class="page-link">{{ laporan_pagination.page }} dari {{ laporan_pagination.total_pages }}</span>
-                </li>
-                <li class="page-item {% if laporan_pagination.page == laporan_pagination.total_pages %}disabled{% endif %}">
-                    <a class="page-link" href="{{ url_for('index', laporan_page=laporan_pagination.page + 1, pengumuman_page=pengumuman_pagination.page) }}">&raquo;</a>
-                </li>
-            </ul>
-        </nav>
-        {% endif %}
-        </div>
-
-    <div class="col-lg-6">
-        <div class="card shadow-sm">
-            <div class="card-header bg-white border-0 pt-3">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0 fw-bold"><i class="bi bi-map-fill me-2 text-primary"></i>Peta Sebaran Laporan</h5>
-                    <div class="btn-group btn-group-sm" role="group">
-                        <input type="radio" class="btn-check" name="map_filter" id="filter_semua" value="semua" checked>
-                        <label class="btn btn-outline-primary" for="filter_semua">Semua</label>
-
-                        <input type="radio" class="btn-check" name="map_filter" id="filter_berjalan" value="berjalan">
-                        <label class="btn btn-outline-primary" for="filter_berjalan">Berjalan</label>
-
-                        <input type="radio" class="btn-check" name="map_filter" id="filter_selesai" value="selesai">
-                        <label class="btn btn-outline-primary" for="filter_selesai">Selesai</label>
+     <div class="col-lg-3 bg-pr">
+          <h4 class="mb-3"><i class="bi bi-list-ul me-2"></i>Laporan Terbaru</h4>
+          <div class="list-group shadow-sm listlaporan">
+               {% for laporan in paginated_laporan_list %}
+               <a href="{{ url_for('detail_laporan', laporan_id=laporan.id) }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-start">
+                    <div class="ms-2 me-auto">
+                         <div class="fw-bold">{{ laporan.judul }}</div>
+                         <small class="text-muted"><i class="bi bi-clock me-1"></i>{{ laporan.timestamp.split(' ')[0] }}</small>
                     </div>
-                </div>
-            </div>
-            <div class="card-body p-0">
-                <div id="map" style="height: 520px; border-radius: 0 0 .375rem .375rem;"></div>
-            </div>
-        </div>
-    </div>
+                    <span
+                         class="badge {% if laporan.status == 'Diterima' %}text-bg-warning {% elif laporan.status == 'Diproses' %}text-bg-primary {% elif laporan.status == 'Selesai' %}text-bg-success {% else %}text-bg-secondary {% endif %} rounded-pill"
+                         style="font-size: 0.75rem"
+                         >{{ laporan.status }}</span
+                    >
+               </a>
+               {% else %}
+               <div class="list-group-item text-center text-muted">Belum ada laporan.</div>
+               {% endfor %}
+          </div>
 
-    <div class="col-lg-3">
-        <h4 class="mb-3"><i class="bi bi-megaphone me-2"></i>Pengumuman</h4>
-        <div class="list-group shadow-sm">
-            {% for p in paginated_pengumuman_list %}
-            <a href="{{ url_for('detail_laporan', laporan_id=p.id) }}" class="list-group-item list-group-item-action">
-                <div class="fw-bold">Re: {{ p.judul }}</div>
-                <p class="mb-1 small text-muted">"{{ p.pengumuman_publik|truncate(80) }}"</p>
-                <small class="text-muted"><i class="bi bi-calendar-check me-1"></i>{{ p.timestamp.split(' ')[0] }}</small>
-            </a>
-            {% else %}
-            <div class="list-group-item text-center text-muted">Belum ada pengumuman.</div>
-            {% endfor %}
-        </div>
-        
-        {% if pengumuman_pagination.total_pages > 1 %}
-        <nav class="mt-3">
-            <ul class="pagination pagination-sm justify-content-center">
-                <li class="page-item {% if pengumuman_pagination.page == 1 %}disabled{% endif %}">
-                    <a class="page-link" href="{{ url_for('index', laporan_page=laporan_pagination.page, pengumuman_page=pengumuman_pagination.page - 1) }}">&laquo;</a>
-                </li>
-                <li class="page-item active">
-                    <span class="page-link">{{ pengumuman_pagination.page }} dari {{ pengumuman_pagination.total_pages }}</span>
-                </li>
-                <li class="page-item {% if pengumuman_pagination.page == pengumuman_pagination.total_pages %}disabled{% endif %}">
-                    <a class="page-link" href="{{ url_for('index', laporan_page=laporan_pagination.page, pengumuman_page=pengumuman_pagination.page + 1) }}">&raquo;</a>
-                </li>
-            </ul>
-        </nav>
-        {% endif %}
-        </div>
+          {% if laporan_pagination.total_pages > 1 %}
+          <nav class="mt-3">
+               <ul class="pagination pagination-sm justify-content-center">
+                    <li class="page-item {% if laporan_pagination.page == 1 %}disabled{% endif %}">
+                         <a class="page-link" href="{{ url_for('index', laporan_page=laporan_pagination.page - 1, pengumuman_page=pengumuman_pagination.page) }}">&laquo;</a>
+                    </li>
+                    <li class="page-item active">
+                         <span class="page-link">{{ laporan_pagination.page }} dari {{ laporan_pagination.total_pages }}</span>
+                    </li>
+                    <li class="page-item {% if laporan_pagination.page == laporan_pagination.total_pages %}disabled{% endif %}">
+                         <a class="page-link" href="{{ url_for('index', laporan_page=laporan_pagination.page + 1, pengumuman_page=pengumuman_pagination.page) }}">&raquo;</a>
+                    </li>
+               </ul>
+          </nav>
+          {% endif %}
+     </div>
+
+     <div class="col-lg-6">
+          <div class="card shadow-sm">
+               <div class="card-header bg-white border-0 pt-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                         <h5 class="mb-0 fw-bold"><i class="bi bi-map-fill me-2 text-primary"></i>Peta Sebaran Laporan</h5>
+                         <div class="btn-group btn-group-sm" role="group">
+                              <input type="radio" class="btn-check" name="map_filter" id="filter_semua" value="semua" checked />
+                              <label class="btn btn-outline-primary" for="filter_semua">Semua</label>
+
+                              <input type="radio" class="btn-check" name="map_filter" id="filter_berjalan" value="berjalan" />
+                              <label class="btn btn-outline-primary" for="filter_berjalan">Berjalan</label>
+
+                              <input type="radio" class="btn-check" name="map_filter" id="filter_selesai" value="selesai" />
+                              <label class="btn btn-outline-primary" for="filter_selesai">Selesai</label>
+                         </div>
+                    </div>
+               </div>
+               <div class="card-body p-0">
+                    <div id="map" style="height: 520px; border-radius: 0 0 0.375rem 0.375rem"></div>
+               </div>
+          </div>
+     </div>
+
+     <div class="col-lg-3">
+          <h4 class="mb-3"><i class="bi bi-megaphone me-2"></i>Pengumuman</h4>
+          <div class="list-group shadow-sm">
+               {% for p in paginated_pengumuman_list %}
+               <a href="{{ url_for('detail_laporan', laporan_id=p.id) }}" class="list-group-item list-group-item-action">
+                    <div class="fw-bold">Re: {{ p.judul }}</div>
+                    <p class="mb-1 small text-muted">"{{ p.pengumuman_publik|truncate(80) }}"</p>
+                    <small class="text-muted"><i class="bi bi-calendar-check me-1"></i>{{ p.timestamp.split(' ')[0] }}</small>
+               </a>
+               {% else %}
+               <div class="list-group-item text-center text-muted">Belum ada pengumuman.</div>
+               {% endfor %}
+          </div>
+
+          {% if pengumuman_pagination.total_pages > 1 %}
+          <nav class="mt-3">
+               <ul class="pagination pagination-sm justify-content-center">
+                    <li class="page-item {% if pengumuman_pagination.page == 1 %}disabled{% endif %}">
+                         <a class="page-link" href="{{ url_for('index', laporan_page=laporan_pagination.page, pengumuman_page=pengumuman_pagination.page - 1) }}">&laquo;</a>
+                    </li>
+                    <li class="page-item active">
+                         <span class="page-link">{{ pengumuman_pagination.page }} dari {{ pengumuman_pagination.total_pages }}</span>
+                    </li>
+                    <li class="page-item {% if pengumuman_pagination.page == pengumuman_pagination.total_pages %}disabled{% endif %}">
+                         <a class="page-link" href="{{ url_for('index', laporan_page=laporan_pagination.page, pengumuman_page=pengumuman_pagination.page + 1) }}">&raquo;</a>
+                    </li>
+               </ul>
+          </nav>
+          {% endif %}
+     </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
-{{ super() }}
+{% endblock %} {% block scripts %} {{ super() }}
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    var map = L.map('map').setView([-5.42, 105.26], 13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    }).addTo(map);
+     document.addEventListener('DOMContentLoaded', function () {
+         var map = L.map('map').setView([-5.42, 105.26], 13);
+         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+             maxZoom: 19,
+             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+         }).addTo(map);
 
-    const allLaporanData = {{ all_laporan_list | tojson | safe }};
-    let markers = L.layerGroup().addTo(map);
+         const allLaporanData = {{ all_laporan_list | tojson | safe }};
+         let markers = L.layerGroup().addTo(map);
 
-    // Definisi warna yang konsisten dengan badge status
-    const statusColors = {
-        'Diterima': '#ffc107', // Kuning
-        'Diproses': '#0d6efd', // Biru
-        'Selesai': '#198754'   // Hijau
-    };
+         // Definisi warna yang konsisten dengan badge status
+         const statusColors = {
+             'Diterima': '#ffc107', // Kuning
+             'Diproses': '#0d6efd', // Biru
+             'Selesai': '#198754'   // Hijau
+         };
 
-    function createCustomIcon(status) {
-        const color = statusColors[status] || '#6c757d'; // Default color abu-abu
-        return L.divIcon({
-            html: `<div style="width: 24px; height: 24px; background-color: ${color}; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.4); border: 2px solid white;"><i class="bi bi-geo-alt-fill" style="color: white; font-size: 12px;"></i></div>`,
-            className: 'custom-map-icon',
-            iconSize: [24, 24],
-            iconAnchor: [12, 24],
-            popupAnchor: [0, -24]
-        });
-    }
+         function createCustomIcon(status) {
+             const color = statusColors[status] || '#6c757d'; // Default color abu-abu
+             return L.divIcon({
+                 html: `<div style="width: 24px; height: 24px; background-color: ${color}; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.4); border: 2px solid white;"><i class="bi bi-geo-alt-fill" style="color: white; font-size: 12px;"></i></div>`,
+                 className: 'custom-map-icon',
+                 iconSize: [24, 24],
+                 iconAnchor: [12, 24],
+                 popupAnchor: [0, -24]
+             });
+         }
 
-    function updateMap(filter) {
-        markers.clearLayers();
-        allLaporanData.forEach(function(laporan) {
-            let show = false;
-            if (filter === 'semua') {
-                show = true;
-            } else if (filter === 'selesai' && laporan.status === 'Selesai') {
-                show = true;
-            } else if (filter === 'berjalan' && (laporan.status === 'Diterima' || laporan.status === 'Diproses')) {
-                show = true;
-            }
+         function updateMap(filter) {
+             markers.clearLayers();
+             allLaporanData.forEach(function(laporan) {
+                 let show = false;
+                 if (filter === 'semua') {
+                     show = true;
+                 } else if (filter === 'selesai' && laporan.status === 'Selesai') {
+                     show = true;
+                 } else if (filter === 'berjalan' && (laporan.status === 'Diterima' || laporan.status === 'Diproses')) {
+                     show = true;
+                 }
 
-            if (show && laporan.latitude && laporan.longitude) {
-                var marker = L.marker([laporan.latitude, laporan.longitude], { 
-                    icon: createCustomIcon(laporan.status) 
-                });
-                marker.bindPopup(`<b>${laporan.judul}</b><br>Status: ${laporan.status}<br><a href="/laporan/${laporan.id}">Lihat Detail</a>`);
-                markers.addLayer(marker);
-            }
-        });
-    }
+                 if (show && laporan.latitude && laporan.longitude) {
+                     var marker = L.marker([laporan.latitude, laporan.longitude], {
+                         icon: createCustomIcon(laporan.status)
+                     });
+                     marker.bindPopup(`<b>${laporan.judul}</b><br>Status: ${laporan.status}<br><a href="/laporan/${laporan.id}">Lihat Detail</a>`);
+                     markers.addLayer(marker);
+                 }
+             });
+         }
 
-    document.querySelectorAll('input[name="map_filter"]').forEach(radio => {
-        radio.addEventListener('change', function() {
-            updateMap(this.value);
-        });
-    });
+         document.querySelectorAll('input[name="map_filter"]').forEach(radio => {
+             radio.addEventListener('change', function() {
+                 updateMap(this.value);
+             });
+         });
 
-    // Initial map load
-    updateMap('semua');
-});
+         // Initial map load
+         updateMap('semua');
+     });
 </script>
 {% endblock %}
