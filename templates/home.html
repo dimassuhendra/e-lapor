@@ -1,7 +1,13 @@
 {% extends "layout.html" %} {% block title %}Dashboard Publik Lapor!{% endblock %} {% block content %}
-<div class="text-center mb-5">
-     <h1 class="display-5 fw-bold">Dashboard Pelaporan Publik</h1>
-     <p class="lead text-muted">Pantau laporan warga dan pengumuman terbaru dari Pemerintah Kota Bandar Lampung.</p>
+<div class="section" id="hero">
+     <div class="container py-5 text-center">
+          <h1 class="display-3 fw-bold text-white mb-3">Suara Anda, Perubahan Kota Kami</h1>
+          <p class="lead text-white-50">Platform resmi Lapor! Pemerintah Kota Bandar Lampung. Laporkan berbagai isu mulai dari infrastruktur, layanan publik, hingga lingkungan, dan pantau langsung perkembangannya.</p>
+          <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mt-4">
+               <a href="{{ url_for('lapor') }}" class="btn btn-warning btn-lg px-4 gap-3 fw-bold laporan"> <i class="bi bi-chat-left-text-fill me-2"></i>Buat Laporan </a>
+               <a href="{{ url_for('index') }}" class="btn btn-outline-light btn-lg px-4"> <i class="bi bi-list-ul me-2"></i>Lihat Semua Laporan </a>
+          </div>
+     </div>
 </div>
 
 <div class="row g-4">

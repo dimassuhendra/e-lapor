@@ -40,7 +40,9 @@
       body {
         font-family: var(--font-family-main);
         background-color: #f8f9fa;
-        background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23dce1e6' fill-opacity='0.7' fill-rule='evenodd'%3E%3Cpath d='M5 0h1L0 6V5zM6 5v1H5z'/%3E%3C/g%3E%3C/svg%3E");
+        background-image: linear-gradient(to right, rgba(74, 144, 226, 0.6), rgba(0, 106, 78, 0.6), rgba(255, 255, 255, 0.6)), url("../static/img/bg2.jpg");
+        background-repeat: no-repeat;
+        background-size: cover;
         color: var(--dark-text);
         display: flex;
         flex-direction: column;
@@ -104,6 +106,14 @@
         box-shadow: 0 4px 15px rgba(0, 106, 78, 0.2);
       }
 
+      /* Section Hero */
+      #hero {
+        min-height: 50vh;
+        /* background-image: url(../static/img/bg4.jpg);
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: center; */
+      }
       /* Footer */
       .footer {
         background-color: #2c3e50; /* Warna gelap yang elegan */
