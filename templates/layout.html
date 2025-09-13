@@ -1,209 +1,182 @@
 <!DOCTYPE html>
 <html lang="id">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{% block title %}Lapor! - Kota Bandar Lampung{% endblock %}</title>
+     <head>
+          <meta charset="UTF-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+          <title>{% block title %}Lapor! - Kota Bandar Lampung{% endblock %}</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+          <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
+          <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
 
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
-    />
+          <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
 
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    />
+          <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-    <style>
-      :root {
-        --primary-color: #006a4e; /* Hijau Tua Profesional */
-        --secondary-color: #4a90e2; /* Biru sebagai Aksen */
-        --light-bg: #fdfdff;
-        --dark-text: #343a40;
-        --light-text: #ffffff;
-        --font-family-main: "Poppins", sans-serif;
-      }
+          <style>
+               :root {
+                    --primary-color: #006a4e; /* Hijau Tua Profesional */
+                    --secondary-color: #4a90e2; /* Biru sebagai Aksen */
+                    --light-bg: #fdfdff;
+                    --dark-text: #343a40;
+                    --light-text: #ffffff;
+                    --font-family-main: "Poppins", sans-serif;
+               }
 
-      body {
-        font-family: var(--font-family-main);
-        background-color: #f8f9fa;
-        background-image: linear-gradient(to right, rgba(74, 144, 226, 0.6), rgba(0, 106, 78, 0.6), rgba(255, 255, 255, 0.6)), url("../static/img/bg2.jpg");
+               body {
+                    font-family: var(--font-family-main);
+                    /* background-image: linear-gradient(to right, rgba(74, 144, 226, 0.6), rgba(0, 106, 78, 0.6), rgba(255, 255, 255, 0.6)), url("../static/img/bg2.jpg");
         background-repeat: no-repeat;
-        background-size: cover;
-        color: var(--dark-text);
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
-      }
+        background-size: cover; */
+                    color: var(--dark-text);
+                    display: flex;
+                    flex-direction: column;
+                    min-height: 100vh;
+               }
 
-      main {
-        flex: 1;
-      }
+               main {
+                    flex: 1;
+               }
 
-      /* Navbar Modern */
-      .navbar {
-        background-color: var(--light-text);
-        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
-        padding: 0.8rem 0;
-      }
+               /* Navbar Modern */
+               .navbar {
+                    background-color: var(--light-text);
+                    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+                    padding: 0.8rem 0;
+               }
 
-      .navbar-brand img {
-        height: 40px;
-        width: auto;
-        margin-right: 12px;
-      }
+               .navbar-brand img {
+                    height: 40px;
+                    width: auto;
+                    margin-right: 12px;
+               }
 
-      .navbar-title .main-title {
-        font-weight: 700;
-        color: var(--primary-color);
-        font-size: 1.5rem;
-      }
+               .navbar-title .main-title {
+                    font-weight: 700;
+                    color: var(--primary-color);
+                    font-size: 1.5rem;
+               }
 
-      .navbar-title .sub-title {
-        font-size: 0.85rem;
-        color: #6c757d;
-        display: block;
-        line-height: 1;
-      }
+               .navbar-title .sub-title {
+                    font-size: 0.85rem;
+                    color: #6c757d;
+                    display: block;
+                    line-height: 1;
+               }
 
-      .nav-link {
-        font-weight: 500;
-        color: var(--dark-text);
-        transition: color 0.3s ease;
-      }
+               .nav-link {
+                    font-weight: 500;
+                    color: var(--dark-text);
+                    transition: color 0.3s ease;
+               }
 
-      .nav-link:hover {
-        color: var(--primary-color);
-      }
+               .nav-link:hover {
+                    color: var(--primary-color);
+               }
 
-      /* Tombol "Buat Laporan" di Navbar */
-      .navbar .btn {
-        background-color: var(--primary-color);
-        border-color: var(--primary-color);
-        font-weight: 600;
-        border-radius: 50rem;
-        transition: all 0.3s ease;
-        padding: 8px 20px;
-      }
+               /* Tombol "Buat Laporan" di Navbar */
+               .navbar .btn {
+                    background-color: var(--primary-color);
+                    border-color: var(--primary-color);
+                    font-weight: 600;
+                    border-radius: 50rem;
+                    transition: all 0.3s ease;
+                    padding: 8px 20px;
+               }
 
-      .navbar .btn:hover {
-        background-color: #00563f;
-        border-color: #00563f;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(0, 106, 78, 0.2);
-      }
+               .navbar .btn:hover {
+                    background-color: #00563f;
+                    border-color: #00563f;
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 15px rgba(0, 106, 78, 0.2);
+               }
 
-      /* Section Hero */
-      #hero {
-        min-height: 50vh;
-        /* background-image: url(../static/img/bg4.jpg);
-        background-repeat: no-repeat;
-        background-size: cover;
-        background-position: center; */
-      }
-      /* Footer */
-      .footer {
-        background-color: #2c3e50; /* Warna gelap yang elegan */
-        padding: 40px 0;
-      }
+               .utama {
+                    padding: 0 !important;
+               }
 
-      .footer p,
-      .footer a {
-        color: #bdc3c7;
-        text-decoration: none;
-      }
+               /* Section Hero */
+               #hero {
+                    min-height: 50vh;
+                    background-image: linear-gradient(to right, #4a90e299, #006a4e99, #ffffff99), url("../static/img/bg2.jpg");
+                    background-repeat: no-repeat;
+                    background-size: cover;
+                    background-position: center;
+               }
+               #peta {
+                    min-height: 50vh;
+                    background-color: #fff;
+               }
+               .update {
+                    border-bottom: 4px solid;
+                    border-color: black;
+                    border-radius: 30%;
+               }
+               /* Footer */
+               .footer {
+                    background-color: #2c3e50; /* Warna gelap yang elegan */
+                    padding: 40px 0;
+               }
 
-      .footer a:hover {
-        color: var(--light-text);
-      }
-    </style>
-  </head>
-  <body>
-    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
-      <div class="container">
-        <a
-          class="navbar-brand d-flex align-items-center"
-          href="{{ url_for('index') }}"
-        >
-          <img
-            src="{{ url_for('static', filename='img/logo.png') }}"
-            alt="Logo Bandar Lampung"
-          />
-          <div class="navbar-title">
-            <span class="main-title">Lapor!</span>
-            <span class="sub-title">Pemerintah Kota Bandar Lampung</span>
-          </div>
-        </a>
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ms-auto align-items-center">
-            <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('index') }}">Peta Laporan</a>
-            </li>
-            <li class="nav-item ms-lg-3">
-              <a
-                class="nav-link btn btn-success text-white px-3"
-                href="{{ url_for('lapor') }}"
-              >
-                <i class="bi bi-megaphone-fill me-2"></i>Buat Laporan Baru
-              </a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
+               .footer p,
+               .footer a {
+                    color: #bdc3c7;
+                    text-decoration: none;
+               }
 
-    <main class="py-5">
-      <div class="container">
-        {% with messages = get_flashed_messages(with_categories=true) %} {% if
-        messages %} {% for category, message in messages %}
-        <div
-          class="alert alert-{{ category }} alert-dismissible fade show"
-          role="alert"
-        >
-          {{ message }}
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="alert"
-            aria-label="Close"
-          ></button>
-        </div>
-        {% endfor %} {% endif %} {% endwith %} {% block content %}{% endblock %}
-      </div>
-    </main>
+               .footer a:hover {
+                    color: var(--light-text);
+               }
+          </style>
+     </head>
+     <body>
+          <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+               <div class="container">
+                    <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
+                         <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo Bandar Lampung" />
+                         <div class="navbar-title">
+                              <span class="main-title">Lapor!</span>
+                              <span class="sub-title">Pemerintah Kota Bandar Lampung</span>
+                         </div>
+                    </a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                         <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                         <ul class="navbar-nav ms-auto align-items-center">
+                              <li class="nav-item">
+                                   <a class="nav-link" href="{{ url_for('index') }}">Peta Laporan</a>
+                              </li>
+                              <li class="nav-item ms-lg-3">
+                                   <a class="nav-link btn btn-success text-white px-3" href="{{ url_for('lapor') }}"> <i class="bi bi-megaphone-fill me-2"></i>Buat Laporan Baru </a>
+                              </li>
+                         </ul>
+                    </div>
+               </div>
+          </nav>
 
-    <footer class="footer bg-dark text-white text-center py-3 mt-auto">
-      <div class="container">
-        <p class="mb-0">
-          &copy; 2025 - Dinas Komunikasi dan Informasi Bandar Lampung
-        </p>
-      </div>
-    </footer>
+          <main>
+               <div class="container-fluid utama">
+                    {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %} {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                         {{ message }}
+                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endfor %} {% endif %} {% endwith %} {% block content %}{% endblock %}
+               </div>
+          </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+          <footer class="footer bg-dark text-white text-center py-3 mt-auto">
+               <div class="container">
+                    <p class="mb-0">&copy; 2025 - Dinas Komunikasi dan Informasi Bandar Lampung</p>
+               </div>
+          </footer>
 
-    {% block scripts %}{% endblock %}
-  </body>
+          <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+          <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+          {% block scripts %}{% endblock %}
+     </body>
 </html>
