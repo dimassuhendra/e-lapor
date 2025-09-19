@@ -27,13 +27,13 @@
 
                body {
                     font-family: var(--font-family-main);
-                    /* background-image: linear-gradient(to right, rgba(74, 144, 226, 0.6), rgba(0, 106, 78, 0.6), rgba(255, 255, 255, 0.6)), url("../static/img/bg2.jpg");
-        background-repeat: no-repeat;
-        background-size: cover; */
-                    color: var(--dark-text);
                     display: flex;
                     flex-direction: column;
                     min-height: 100vh;
+                    width: 100%;
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    gap: 0 !important;
                }
 
                main {
@@ -98,16 +98,70 @@
                }
 
                /* Section Hero */
-               #hero {
-                    min-height: 50vh;
+               .section#hero {
                     background-image: linear-gradient(to right, #4a90e299, #006a4e99, #ffffff99), url("../static/img/bg2.jpg");
                     background-repeat: no-repeat;
                     background-size: cover;
                     background-position: center;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: flex-end;
+                    margin: 0 !important;
+                    flex-grow: 1;
+               }
+               #hero wave {
+                    margin-bottom: auto !important;
                }
                #peta {
                     min-height: 50vh;
-                    background-color: #fff;
+                    background-color: #f8f9fa;
+               }
+               /* Kustomisasi Kartu Laporan */
+               .laporan-card {
+                    border: none;
+                    border-radius: 1.25rem;
+                    transition: transform 0.3s ease, box-shadow 0.3s ease;
+                    overflow: hidden;
+                    text-decoration: none;
+               }
+
+               .laporan-card:hover {
+                    transform: translateY(-5px);
+                    box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175) !important;
+               }
+
+               .laporan-card .card-body {
+                    padding: 1.5rem;
+                    display: flex;
+                    flex-direction: column;
+               }
+
+               .laporan-card .card-title {
+                    font-size: 1rem; /* Ukuran font judul diperkecil */
+                    font-weight: 700;
+                    margin-bottom: 0.5rem;
+               }
+
+               .laporan-card .card-subtitle {
+                    font-size: 0.85rem; /* Ukuran font sub-judul diperkecil */
+                    margin-bottom: 0.75rem;
+               }
+
+               .laporan-card .card-text {
+                    font-size: 0.8rem; /* Ukuran font deskripsi diperkecil agar tidak terpotong */
+                    color: var(--dark-text);
+                    line-height: 1.5;
+                    flex-grow: 1; /* Pastikan mengambil sisa ruang */
+                    /* Hapus properti 'truncate' di Jinja2, karena sudah tidak perlu */
+                    display: -webkit-box;
+                    -webkit-line-clamp: 5; /* Batasi hingga 5 baris, Anda bisa ubah */
+                    -webkit-box-orient: vertical;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+               }
+
+               .laporan-card .badge {
+                    font-size: 0.75rem; /* Ukuran font status diperkecil */
                }
                .update {
                     border-bottom: 4px solid;

@@ -90,6 +90,15 @@ def seed_db_command():
         return
 
     statuses = ['Diterima', 'Diproses', 'Selesai']
+
+    def get_image_filename(kategori_name):
+        # Mengubah nama kategori menjadi format nama file:
+        # 1. Mengubah ke huruf kecil
+        # 2. Menghilangkan spasi dan menggantinya dengan strip (-) atau langsung digabungkan
+        # 3. Menambahkan ekstensi .jpg
+        # Contoh: "Jalan Rusak" -> "jalanrusak.jpg"
+        clean_name = kategori_name.lower().replace(' ', '')
+        return f"{clean_name}.jpg"
     
     def buat_deskripsi_indonesia(kategori_nama):
         templates = [
@@ -124,9 +133,10 @@ def seed_db_command():
         kategori_id = kategori_terpilih['id']
         kategori_nama = kategori_terpilih['nama_kategori']
         
-        # --- PERUBAHAN 4: Gunakan waktu WIB untuk seeder ---
+        # --- PERUBAHAN BARU: Ambil nama file gambar
+        foto_name = get_image_filename(kategori_nama)
+        
         tanggal_laporan = fake.date_time_this_year(tzinfo=WIB)
-        # --- AKHIR PERUBAHAN 4 ---
         
         nomor_laporan = f"{KODE_KECAMATAN.get(kecamatan_name, 'XXX')}-{tanggal_laporan.strftime('%d/%m')}-{i+1:04d}"
         nama_pelapor = fake.name()
@@ -140,13 +150,13 @@ def seed_db_command():
         longitude = base_lon + random.uniform(-0.005, 0.005)
         
         conn.execute(
-            'INSERT INTO laporan (nomor_laporan, nama_pelapor, no_whatsapp, judul, deskripsi, kategori_id, kecamatan, kelurahan, latitude, longitude, status, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            (nomor_laporan, nama_pelapor, no_whatsapp, judul, deskripsi, kategori_id, kecamatan_name, kelurahan_name, latitude, longitude, status, tanggal_laporan)
+            'INSERT INTO laporan (nomor_laporan, nama_pelapor, no_whatsapp, judul, deskripsi, kategori_id, kecamatan, kelurahan, latitude, longitude, status, timestamp, foto) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            (nomor_laporan, nama_pelapor, no_whatsapp, judul, deskripsi, kategori_id, kecamatan_name, kelurahan_name, latitude, longitude, status, tanggal_laporan, foto_name)
         )
     
     conn.commit()
     conn.close()
-    print("300 data palsu berhasil ditambahkan dengan kategori yang terhubung.")
+    print("1000 data palsu berhasil ditambahkan dengan kategori yang terhubung dan gambar.")
 
 # --- Decorator ---
 def login_required(f):

@@ -9,64 +9,63 @@
           </div>
      </div>
 
-     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
+     <svg id="wave" style="transform: rotate(0deg); transition: 0.3s" viewBox="0 0 1440 100" version="1.1" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+               <linearGradient id="sw-gradient-0" x1="0" x2="0" y1="1" y2="0">
+                    <stop stop-color="rgba(248, 249, 250, 1)" offset="0%"></stop>
+                    <stop stop-color="rgba(248, 249, 250, 1)" offset="100%"></stop>
+               </linearGradient>
+          </defs>
           <path
-               fill="#fff"
-               fill-opacity="1"
-               d="M0,128L34.3,154.7C68.6,181,137,235,206,234.7C274.3,235,343,181,411,176C480,171,549,213,617,234.7C685.7,256,754,256,823,224C891.4,192,960,128,1029,128C1097.1,128,1166,192,1234,218.7C1302.9,245,1371,235,1406,229.3L1440,224L1440,320L1405.7,320C1371.4,320,1303,320,1234,320C1165.7,320,1097,320,1029,320C960,320,891,320,823,320C754.3,320,686,320,617,320C548.6,320,480,320,411,320C342.9,320,274,320,206,320C137.1,320,69,320,34,320L0,320Z"
+               style="transform: translate(0, 0px); opacity: 1"
+               fill="url(#sw-gradient-0)"
+               d="M0,40L30,35C60,30,120,20,180,16.7C240,13,300,17,360,26.7C420,37,480,53,540,50C600,47,660,23,720,25C780,27,840,53,900,65C960,77,1020,73,1080,68.3C1140,63,1200,57,1260,51.7C1320,47,1380,43,1440,41.7C1500,40,1560,40,1620,41.7C1680,43,1740,47,1800,43.3C1860,40,1920,30,1980,36.7C2040,43,2100,67,2160,71.7C2220,77,2280,63,2340,48.3C2400,33,2460,17,2520,16.7C2580,17,2640,33,2700,33.3C2760,33,2820,17,2880,23.3C2940,30,3000,60,3060,60C3120,60,3180,30,3240,23.3C3300,17,3360,33,3420,40C3480,47,3540,43,3600,46.7C3660,50,3720,60,3780,66.7C3840,73,3900,77,3960,73.3C4020,70,4080,60,4140,48.3C4200,37,4260,23,4290,16.7L4320,10L4320,100L4290,100C4260,100,4200,100,4140,100C4080,100,4020,100,3960,100C3900,100,3840,100,3780,100C3720,100,3660,100,3600,100C3540,100,3480,100,3420,100C3360,100,3300,100,3240,100C3180,100,3120,100,3060,100C3000,100,2940,100,2880,100C2820,100,2760,100,2700,100C2640,100,2580,100,2520,100C2460,100,2400,100,2340,100C2280,100,2220,100,2160,100C2100,100,2040,100,1980,100C1920,100,1860,100,1800,100C1740,100,1680,100,1620,100C1560,100,1500,100,1440,100C1380,100,1320,100,1260,100C1200,100,1140,100,1080,100C1020,100,960,100,900,100C840,100,780,100,720,100C660,100,600,100,540,100C480,100,420,100,360,100C300,100,240,100,180,100C120,100,60,100,30,100L0,100Z"
           ></path>
      </svg>
 </div>
 
-<div class="section d-flex align-items-center" id="peta">
+<div class="section" id="peta">
      <div class="container-md text-center">
           <div class="row p-4 justify-content-around align-items-center">
-               <div class="col-3 update">
-                    <h4 class="display-5 fw-bold text-black">Laporan Terbaru</h4>
+               <div class="col-12 text-center mb-5">
+                    <h4 class="display-6 fw-bold text-black">Laporan Terbaru</h4>
+                    <p class="text-muted">Lihat laporan terbaru yang sudah masuk.</p>
                </div>
 
-               <div class="col-6">
-                    <div id="laporanCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
-                         <!-- <ol class="carousel-indicators">
-                              {% for laporan in paginated_laporan_list %} {% if loop.index0 < 10 %}
-                              <li
-                                   data-bs-target="#laporanCarousel"
-                                   data-bs-slide-to="{{ loop.index0 }}"
-                                   class="{% if loop.first %}active{% endif %}"
-                                   aria-current="{% if loop.first %}true{% else %}false{% endif %}"
-                                   aria-label="Slide {{ loop.index }}"
-                              ></li>
-                              {% endif %} {% endfor %}
-                         </ol> -->
-
+               <div class="col-12">
+                    <div id="laporanCarousel" class="carousel slide" data-bs-ride="carousel">
                          <div class="carousel-inner" role="listbox">
-                              {% for laporan in paginated_laporan_list %} {% if loop.index0 < 10 %}
+                              {% set chunk_size = 4 %} {% set chunks = (paginated_laporan_list | batch(chunk_size)) %} {% for chunk in chunks %}
                               <div class="carousel-item {% if loop.first %}active{% endif %}">
-                                   <a href="{{ url_for('detail_laporan', laporan_id=laporan.id) }}" class="card text-decoration-none h-100">
-                                        <div class="card-body p-5">
-                                             <h5 class="card-title">{{ laporan.judul }}</h5>
-                                             <h6 class="card-subtitle mb-2 text-muted">Pelapor: {{ laporan.nama_pelapor }}</h6>
-
-                                             <p class="card-text">{{ laporan.deskripsi }}</p>
-
-                                             <div class="d-flex justify-content-between align-items-center mt-3">
-                                                  <span
-                                                       class="badge {% if laporan.status == 'Diterima' %} bg-warning text-dark {% elif laporan.status == 'Diproses' %} bg-info text-dark {% elif laporan.status == 'Selesai' %} bg-success {% else %} bg-secondary {% endif %} rounded-pill"
-                                                  >
-                                                       {{ laporan.status }}
-                                                  </span>
-                                                  <small class="text-muted">{{ laporan.timestamp.split(' ')[0] }}</small>
-                                             </div>
+                                   <div class="row g-4">
+                                        {% for laporan in chunk %}
+                                        <div class="col-lg-3 col-md-6">
+                                             <a href="{{ url_for('detail_laporan', laporan_id=laporan.id) }}" class="card laporan-card shadow-sm h-100">
+                                                  <div class="card-body d-flex flex-column">
+                                                       <h5 class="card-title fw-bold text-truncate">{{ laporan.judul }}</h5>
+                                                       <h6 class="card-subtitle mb-2 text-muted">Pelapor: {{ laporan.nama_pelapor }}</h6>
+                                                       <p class="card-text flex-grow-1">{{ laporan.deskripsi }}</p>
+                                                       <div class="d-flex justify-content-between align-items-center mt-auto pt-2">
+                                                            <span
+                                                                 class="badge {% if laporan.status == 'Diterima' %}bg-warning text-dark{% elif laporan.status == 'Diproses' %}bg-info text-dark{% elif laporan.status == 'Selesai' %}bg-success{% else %}bg-secondary{% endif %} rounded-pill"
+                                                            >
+                                                                 {{ laporan.status }}
+                                                            </span>
+                                                            <small class="text-muted">{{ laporan.timestamp.split(' ')[0] }}</small>
+                                                       </div>
+                                                  </div>
+                                             </a>
                                         </div>
-                                   </a>
+                                        {% endfor %}
+                                   </div>
                               </div>
-                              {% endif %} {% else %}
+                              {% endfor %} {% if not paginated_laporan_list %}
                               <div class="carousel-item active">
-                                   <div class="d-flex align-items-center justify-content-center h-100">
+                                   <div class="d-flex align-items-center justify-content-center py-5">
                                         <p class="text-muted">Belum ada laporan.</p>
                                    </div>
                               </div>
-                              {% endfor %}
+                              {% endif %}
                          </div>
 
                          <button class="carousel-control-prev" type="button" data-bs-target="#laporanCarousel" data-bs-slide="prev">

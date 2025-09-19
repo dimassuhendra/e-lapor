@@ -110,5 +110,5 @@ INSERT INTO kategori (nama_kategori, deskripsi) VALUES
 ('Drainase & Banjir', 'Laporan mengenai saluran air atau gorong-gorong yang tersumbat dan menyebabkan genangan air.'),
 ('Fasilitas Umum Rusak', 'Laporan kerusakan pada fasilitas publik seperti halte, rambu lalu lintas, atau trotoar.'),
 ('Ketertiban Umum', 'Laporan gangguan ketertiban seperti parkir liar, PKL, atau spanduk ilegal.'),
-('Pohon Tumbang / Berbahaya', 'Laporan mengenai pohon yang tumbang atau dahan yang berisiko patah.'),
+('Pohon Tumbang', 'Laporan mengenai pohon yang tumbang atau dahan yang berisiko patah.'),
 ('Lainnya', 'Kategori untuk laporan lain yang tidak termasuk dalam kategori di atas.');
