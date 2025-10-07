@@ -1,4 +1,38 @@
 {% extends "admin/layout.html" %} {% block title %}Analisis Data{% endblock %} {% block page_title %}Halaman Analisis Data Laporan{% endblock %} {% block content %}
+<style>
+     .card-chart {
+          max-height: 600px;
+     }
+     canvas {
+          min-height: 360px;
+     }
+     .custom-tabs {
+          border-bottom: 1px solid #dddddd;
+     }
+
+     .custom-tabs .btn {
+          border: none;
+          border-radius: 0;
+          margin-bottom: -1px;
+          background: transparent;
+          color: #495057;
+          font-weight: 500;
+          padding: 6px 14px;
+          transition: all 0.2s ease-in-out;
+     }
+
+     .custom-tabs .btn:hover {
+          color: #0d6efd;
+     }
+
+     .custom-tabs .btn.active {
+          border: 1px solid #dddddd;
+          border-bottom: 1px solid #fff;
+          background: #fff;
+          color: #495057;
+          font-weight: 600;
+     }
+</style>
 <div class="card mb-4">
      <div class="card-body">
           <form method="get" action="{{ url_for('analisis') }}">
@@ -23,63 +57,76 @@
 </div>
 
 {% if results and results.total_laporan > 0 %}
-<div class="row g-4 dashboard-grid">
-     <div class="col-xl-8">
-          <div class="row g-4">
-               <div class="col-12">
-                    <div class="card">
-                         <div class="card-header">
-                              <h5 class="mb-0">📊 Tren Laporan per Bulan (per Kategori)</h5>
-                         </div>
-                         <div class="card-body">
-                              <canvas id="monthlyTrendChart" style="height: 220px"></canvas>
-                         </div>
+<!-- Frist Row ----------------------------------->
+<div class="row mb-3 d-flex align-items-stretch">
+     <!-- Col Tren Laporan per Bulan -->
+     <div class="col-9">
+          <div class="card card-chart">
+               <div class="card-header">
+                    <h5 class="mb-0">📊 Tren Laporan per Bulan (per Kategori)</h5>
+               </div>
+               <div class="mt-2 mb-2 p-1">
+                    <div class="btn-group custom-tabs" role="group" aria-label="Metric switch">
+                         <button type="button" class="btn btn-sm chart-toggle active" data-category="Semua">Semua kategori</button>
+                         <button type="button" class="btn btn-sm chart-toggle" data-category="Drainase & Banjir">Drainase & Banjir</button>
+                         <button type="button" class="btn btn-sm chart-toggle" data-category="Fasilitas Umum Rusak">Fasilitas Umum Rusak</button>
+                         <button type="button" class="btn btn-sm chart-toggle" data-category="Jalan Rusak">Jalan Rusak</button>
+                         <button type="button" class="btn btn-sm chart-toggle" data-category="Ketertiban Umum">Ketertiban Umum</button>
+                         <button type="button" class="btn btn-sm chart-toggle" data-category="Lampu Jalan Mati">Lampu Jalan Mati</button>
+                         <button type="button" class="btn btn-sm chart-toggle" data-category="Pohon Tumbang">Pohon Tumbang</button>
+                         <button type="button" class="btn btn-sm chart-toggle" data-category="Sampah & Kebersihan">Sampah & Kebersihan</button>
+                         <button type="button" class="btn btn-sm chart-toggle" data-category="Lainnya">Lainnya</button>
                     </div>
                </div>
-               <div class="col-12">
-                    <div class="card">
-                         <div class="card-header">
-                              <h5 class="mb-0">📍 Laporan per Kecamatan</h5>
-                         </div>
-                         <div class="card-body">
-                              <canvas id="kecamatanChart" style="height: 220px"></canvas>
-                         </div>
-                    </div>
+               <div class="card-body">
+                    <canvas id="monthlyTrendChart"></canvas>
                </div>
           </div>
      </div>
-
-     <div class="col-xl-4">
-          <div class="row g-4">
-               <div class="col-12">
-                    <div class="card">
-                         <div class="card-header d-flex justify-content-between align-items-center">
-                              <h5 class="mb-0">📌 Laporan per Kategori</h5>
-                              <a href="{{ url_for('download_csv', data_type='kategori', start_date=filters.start_date, end_date=filters.end_date) }}" class="btn btn-sm btn-outline-light">CSV</a>
-                         </div>
-                         <div class="card-body">
-                              <canvas id="categoryChart" style="height: 220px"></canvas>
-                         </div>
-                    </div>
+     <!-- Col Laporan per Kategori -->
+     <div class="col-3">
+          <div class="card card-chart h-100">
+               <div class="card-header">
+                    <h5 class="mb-0">📌 Laporan per Kategori</h5>
+                    <!-- <a href="{{ url_for('download_csv', data_type='kategori', start_date=filters.start_date, end_date=filters.end_date) }}" class="btn btn-sm btn-outline-light">CSV</a> -->
                </div>
-               <div class="col-12">
-                    <div class="card">
-                         <div class="card-header d-flex justify-content-between align-items-center">
-                              <h5 class="mb-0">📁 Laporan per Status</h5>
-                              <a href="{{ url_for('download_csv', data_type='status', start_date=filters.start_date, end_date=filters.end_date) }}" class="btn btn-sm btn-outline-light">CSV</a>
-                         </div>
-                         <div class="card-body">
-                              <canvas id="statusChart" style="height: 220px"></canvas>
-                         </div>
-                    </div>
+               <div class="card-body">
+                    <canvas id="categoryChart"></canvas>
                </div>
           </div>
      </div>
 </div>
+<!-- Second Row ------------------------------------------->
+<div class="row mb-3">
+     <!-- Col Laporan per Kecamatan ---------------------->
+     <div class="col-12">
+          <div class="card card-chart">
+               <div class="card-header">
+                    <h5 class="mb-0">📍 Laporan per Kecamatan</h5>
+               </div>
+               <div class="card-body">
+                    <canvas id="kecamatanChart"></canvas>
+               </div>
+          </div>
+     </div>
+     <!-- Col Laporan per Status -->
+     <!-- <div class="col-3">
+          <div class="card card-chart">
+               <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">📁 Laporan per Status</h5>
+                    <a href="{{ url_for('download_csv', data_type='status', start_date=filters.start_date, end_date=filters.end_date) }}" class="btn btn-sm btn-outline-light">CSV</a>
+               </div>
+               <div class="card-body">
+                    <canvas id="statusChart"></canvas>
+               </div>
+          </div>
+     </div> -->
+</div>
 
-<div class="row g-4 mt-1">
-     <div class="col-lg-8">
-          <div class="card">
+<!-- Third Row ---------------------->
+<div class="row mb-3">
+     <div class="col-lg-12">
+          <div class="card card-chart">
                <div class="card-header">
                     <h5 class="mb-0">🗺️ Peta Sebaran Masalah</h5>
                </div>
@@ -102,7 +149,11 @@
                </div>
           </div>
      </div>
-     <div class="col-lg-4">
+</div>
+
+<!-- Four Row ---------------------------------------->
+<div class="row">
+     <div class="col-lg-3">
           <div id="carouselId" class="carousel slide" data-bs-ride="carousel">
                <ol class="carousel-indicators">
                     <li data-bs-target="#carouselId" data-bs-slide-to="0" class="active" aria-current="true" aria-label="First slide"></li>
@@ -111,7 +162,7 @@
                </ol>
                <div class="carousel-inner h-100" role="listbox">
                     <div class="carousel-item active">
-                         <div class="card h-100">
+                         <div class="card card-chart">
                               <div class="card-header">
                                    <h5 class="mb-0">☁️ Word Cloud Laporan</h5>
                               </div>
@@ -146,14 +197,14 @@
                     <span class="visually-hidden">Next</span>
                </button>
           </div>
-          <!-- <div class="card h-100">
-               <div class="card-header">
-                    <h5 class="mb-0">☁️ Word Cloud Laporan</h5>
+     </div>
+     <div class="col-sm-9">
+          <div class="card card-chart">
+               <div class="card-header">Summary</div>
+               <div class="card-body">
+                    <canvas></canvas>
                </div>
-               <div class="card-body text-center d-flex align-items-center justify-content-center">
-                    <canvas id="wordCloudCanvas" width="400" height="400"></canvas>
-               </div>
-          </div> -->
+          </div>
      </div>
 </div>
 
@@ -163,263 +214,389 @@
 </div>
 {% endif %} {% endblock %} {% block scripts %} {{ super() }}
 <script src="https://cdn.jsdelivr.net/npm/wordcloud@1.2.2/src/wordcloud2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/wordcloud@1.2.2/src/wordcloud2.min.js"></script>
+
 <script>
-          document.addEventListener('DOMContentLoaded', function() {
-            // Ambil data JSON yang dikirim dari Flask
-            const results = {{ results | tojson | safe }};
+     document.addEventListener('DOMContentLoaded', function() {
+     // Ambil data JSON yang dikirim dari Flask
+          const results = {{ results | tojson | safe }};
 
-            // Hanya jalankan script jika ada data laporan
-            if (results && results.total_laporan > 0) {
+          // Variabel untuk menyimpan instance chart bulanan agar dapat diakses oleh tombol
+          let monthlyTrendChartInstance;
+          let allDatasets;
+          let totalLineDataset;
 
-              /* ===========================
-                 CHART TREND LAPORAN BULANAN
-                 =========================== */
-              const monthlyTrendCtx = document.getElementById('monthlyTrendChart').getContext('2d');
-              const trendData = results.monthly_trends;
+          // Hanya jalankan script jika ada data laporan
+          if (results && results.total_laporan > 0) {
 
-              // Ambil datasets yang sudah disiapkan oleh backend
-              const datasets = trendData.datasets;
+          /* ===========================
+               CHART TREND LAPORAN BULANAN
+          =========================== */
 
-              // Hitung total laporan per bulan untuk membuat garis 'Total'
-              let totalLaporanPerBulan = new Array(trendData.labels.length).fill(0);
-              datasets.forEach(ds => {
-                ds.type = 'bar'; // Pastikan tipe chart adalah bar untuk tumpukan
-                ds.data.forEach((val, idx) => totalLaporanPerBulan[idx] += val);
-              });
+          const monthlyTrendCtx = document.getElementById('monthlyTrendChart').getContext('2d');
+          const trendData = results.monthly_trends;
 
-              // Tambahkan dataset baru untuk garis 'Total Laporan'
-              datasets.push({
-                type: 'line',
-                label: 'Total Laporan',
-                data: totalLaporanPerBulan,
-                borderColor: '#343a40',
-                backgroundColor: 'rgba(52, 58, 64, 0.1)',
-                tension: 0.2,
-                fill: true
-              });
+          // 1. Hitung Total Laporan per Bulan
+          let totalLaporanPerBulan = new Array(trendData.labels.length).fill(0);
+          trendData.datasets.forEach(ds => {
+          ds.data.forEach((val, idx) => {
+               // Pastikan val adalah angka sebelum ditambahkan
+               totalLaporanPerBulan[idx] += typeof val === 'number' ? val : 0;
+          });
+          });
 
-              new Chart(monthlyTrendCtx, {
-                data: {
-                  labels: trendData.labels,
-                  datasets: datasets
-                },
-                options: {
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  plugins: {
-                    legend: { position: 'top' }
-                  },
-                  scales: {
+          // 2. Konversi Data Mentah menjadi Persentase
+          // Kita hanya mengkonversi dataset 'bar' yang akan di-stack
+          let allDatasets = trendData.datasets.map(ds => {
+          // Hanya konversi dataset yang bukan 'line' jika ada di data asli
+          if (ds.type && ds.type === 'line') {
+               return { ...ds, type: 'line' }; // Pertahankan data 'line' asli jika ada
+          }
+
+          // Konversi data menjadi persentase dari total bulanan yang sesuai
+          const percentageData = ds.data.map((val, idx) => {
+               const total = totalLaporanPerBulan[idx];
+               // Hindari pembagian dengan nol
+               return total > 0 ? (val / total) * 100 : 0;
+          });
+
+          return {
+               ...ds,
+               data: percentageData, // Data sekarang dalam persentase (0-100)
+               type: 'bar'
+          };
+          });
+
+          // 3. Tambahkan dataset untuk garis 'Total Laporan' (Sekarang selalu 100%)
+          // Dataset garis total tidak diperlukan lagi jika semua data sudah 100%
+          // Namun, jika Anda ingin menyertakannya sebagai 100%, inilah kodenya:
+          const totalLineDataset = {
+          type: 'line',
+          label: 'Total Laporan (100%)',
+          // Data total harus 100% untuk setiap bulan di sumbu persentase
+          data: new Array(trendData.labels.length).fill(100),
+          borderColor: '#343a40',
+          backgroundColor: 'rgba(52, 58, 64, 0.1)',
+          tension: 0.2,
+          fill: false, // Ubah fill: false agar tidak menutupi bar
+          borderWidth: 2,
+          order: 0,
+          };
+
+          // Gabungkan semua datasets
+          // Hilangkan totalLineDataset jika tidak diperlukan lagi
+          const INITIAL_ALL_DATASETS = [...allDatasets, totalLineDataset];
+
+          // 4. Inisialisasi Chart Bulanan
+          monthlyTrendChartInstance = new Chart(monthlyTrendCtx, {
+          data: {
+               labels: trendData.labels,
+               datasets: INITIAL_ALL_DATASETS
+          },
+          options: {
+               responsive: true,
+               maintainAspectRatio: false,
+               plugins: {
+                    legend: { position: 'top' },
+                    tooltip: {
+                         callbacks: {
+                              label: function(context) {
+                              let label = context.dataset.label || '';
+                              if (label) {
+                                   label += ': ';
+                              }
+
+                              if (context.parsed.y !== null) {
+                                   // Data sudah dalam persentase, jadi tampilkan sebagai %
+                                   const percentage = context.parsed.y;
+                                   label += `${percentage.toFixed(1)}%`;
+
+                                   // *** OPSIONAL: Tambahkan nilai absolut dalam tooltip ***
+                                   // Kita perlu mencari nilai absolut dari data mentah asli
+                                   const originalDatasets = trendData.datasets.find(
+                                        ds => ds.label === context.dataset.label
+                                   );
+                                   if (originalDatasets && context.dataIndex !== undefined) {
+                                        const rawValue = originalDatasets.data[context.dataIndex];
+                                        if (rawValue !== undefined) {
+                                             label += ` (${rawValue.toLocaleString('id-ID')} Laporan)`;
+                                        }
+                                   }
+                              }
+                              return label;
+                              }
+                         }
+                    }
+               },
+               scales: {
                     x: { stacked: true },
-                    y: { stacked: true, beginAtZero: true }
-                  }
-                }
-              });
+                    y: {
+                         stacked: true,
+                         beginAtZero: true,
+                         // Batas Y axis selalu 100 (karena datanya sudah persentase)
+                         max: 100,
+                         // Konfigurasi ticks untuk menampilkan persentase 20%, 40%, dst.
+                         ticks: {
+                              // Setp size 20 untuk mendapatkan 0, 20, 40, 60, 80, 100
+                              stepSize: 20,
+                              callback: function(value) {
+                              // Tampilkan nilai tick sebagai persentase
+                              return value.toFixed(0) + '%';
+                              }
+                         }
+                    }
+               }
+          }
+          });
 
-              /* ===========================
-                 CHART LAPORAN PER KATEGORI
-                 =========================== */
-              const categoryCtx = document.getElementById('categoryChart').getContext('2d');
-              const categoryData = results.stats_by_category;
+     /* ===========================
+          LOGIKA TOGGLE KATEGORI (FIXED)
+     =========================== */
+     document.querySelectorAll('.chart-toggle').forEach(button => {
+          button.addEventListener('click', function() {
+               const category = this.getAttribute('data-category');
 
-              new Chart(categoryCtx, {
-                type: 'bar',
-                data: {
-                  // Ambil label, jumlah, dan warna dari struktur data baru
-                  labels: categoryData.map(item => item.kategori),
-                  datasets: [{
+               // Perbarui status aktif tombol
+               document.querySelectorAll('.chart-toggle').forEach(btn => btn.classList.remove('active'));
+               this.classList.add('active');
+
+               let newDatasets = [];
+               let isStacked = false;
+
+               if (category === 'Semua') {
+                    // Tampilkan semua bar (stacked) dan garis total
+                    newDatasets = [...allDatasets, totalLineDataset];
+                    isStacked = true;
+               } else {
+                    // Tampilkan HANYA kategori yang dipilih (sebagai bar) + Garis Total
+                    const selectedBarDataset = allDatasets.find(ds => ds.label === category);
+
+                    if (selectedBarDataset) {
+                    newDatasets.push({
+                         ...selectedBarDataset,
+                         order: 1, // Bar di belakang garis total
+                    });
+                    }
+
+                    // Tambahkan garis total ke tampilan per kategori
+                    newDatasets.push(totalLineDataset);
+                    isStacked = false; // Nonaktifkan stacking untuk tampilan tunggal
+               }
+
+          // Perbarui datasets dan opsi stacking
+          monthlyTrendChartInstance.data.datasets = newDatasets;
+          monthlyTrendChartInstance.options.scales.x.stacked = isStacked;
+          monthlyTrendChartInstance.options.scales.y.stacked = isStacked;
+
+          monthlyTrendChartInstance.update();
+          });
+     });
+
+          /* ===========================
+               CHART LAPORAN PER KATEGORI
+               =========================== */
+          const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+          const categoryData = results.stats_by_category;
+
+          new Chart(categoryCtx, {
+               type: 'bar',
+               data: {
+               // Ambil label, jumlah, dan warna dari struktur data baru
+               labels: categoryData.map(item => item.kategori),
+               datasets: [{
                     label: 'Jumlah Laporan',
                     data: categoryData.map(item => item.jumlah),
-                    backgroundColor: categoryData.map(item => item.warna)
-                  }]
-                },
-                options: {
-                  indexAxis: 'y',
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  plugins: {
+                    backgroundColor: categoryData.map(item => item.warna),
+               }]
+               },
+               options: {
+               indexAxis: 'y',
+               responsive: true,
+               maintainAspectRatio: false,
+               plugins: {
                     legend: { display: false }
-                  }
-                }
-              });
+               }
+               }
+          });
 
-              /* ===========================
-                 CHART LAPORAN PER STATUS
-                 =========================== */
-              const statusCtx = document.getElementById('statusChart').getContext('2d');
-              new Chart(statusCtx, {
-                type: 'pie',
-                data: {
-                  labels: Object.keys(results.stats_by_status),
-                  datasets: [{
-                    data: Object.values(results.stats_by_status),
-                    backgroundColor: ['#ffc107', '#0dcaf0', '#198754'] // Warna untuk Diterima, Diproses, Selesai
-                  }]
-                },
-                options: {
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  plugins: {
-                    legend: { position: 'top' }
-                  }
-                }
-              });
+          /* ===========================
+               CHART LAPORAN PER STATUS
+               =========================== */
+          // const statusCtx = document.getElementById('statusChart').getContext('2d');
+          // new Chart(statusCtx, {
+          //      type: 'pie',
+          //      data: {
+          //      labels: Object.keys(results.stats_by_status),
+          //      datasets: [{
+          //           data: Object.values(results.stats_by_status),
+          //           backgroundColor: ['#ffc107', '#0dcaf0', '#198754'] // Warna untuk Diterima, Diproses, Selesai
+          //      }]
+          //      },
+          //      options: {
+          //      responsive: true,
+          //      maintainAspectRatio: false,
+          //      plugins: {
+          //           legend: { position: 'top' }
+          //      }
+          //      }
+          // });
 
-              /* ===========================
-                 CHART LAPORAN PER KECAMATAN
-                 =========================== */
-              const kecamatanCtx = document.getElementById('kecamatanChart').getContext('2d');
-              new Chart(kecamatanCtx, {
-                type: 'bar',
-                data: {
-                  labels: Object.keys(results.stats_by_kecamatan),
-                  datasets: [{
+          /* ===========================
+               CHART LAPORAN PER KECAMATAN
+               =========================== */
+          const kecamatanCtx = document.getElementById('kecamatanChart').getContext('2d');
+          new Chart(kecamatanCtx, {
+               type: 'bar',
+               data: {
+               labels: Object.keys(results.stats_by_kecamatan),
+               datasets: [{
                     label: 'Jumlah Laporan',
                     data: Object.values(results.stats_by_kecamatan),
-                    backgroundColor: '#0d6efd'
-                  }]
-                },
-                options: {
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  plugins: {
+                    backgroundColor: '#0d6efd',
+               }]
+               },
+               options: {
+               responsive: true,
+               maintainAspectRatio: false,
+               plugins: {
                     legend: { display: false }
-                  }
-                }
-              });
+               }
+               }
+          });
 
-              /* ===========================
-                 PETA SEBARAN MASALAH
-                 =========================== */
-              var map = L.map('categoryMap').setView([-5.42, 105.26], 12);
-              L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap contributors'
-              }).addTo(map);
+          /* ===========================
+               PETA SEBARAN MASALAH
+               =========================== */
+          var map = L.map('categoryMap').setView([-5.42, 105.26], 12);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+               attribution: '&copy; OpenStreetMap contributors'
+          }).addTo(map);
 
-              // Buat pemetaan warna dari data dinamis untuk digunakan di peta
-              const geoData = results.geospatial_analysis;
-              const dynamicCategoryColors = {};
-              results.stats_by_category.forEach(item => {
-                dynamicCategoryColors[item.kategori] = item.warna;
-              });
+          // Buat pemetaan warna dari data dinamis untuk digunakan di peta
+          const geoData = results.geospatial_analysis;
+          const dynamicCategoryColors = {};
+          results.stats_by_category.forEach(item => {
+               dynamicCategoryColors[item.kategori] = item.warna;
+          });
 
-              var markerClusterGroup = L.markerClusterGroup();
+          var markerClusterGroup = L.markerClusterGroup();
 
-              function updateMarkers() {
-                markerClusterGroup.clearLayers();
-                for (const category in geoData) {
-                  if (document.querySelector(`.category-filter[value="${category}"]`).checked) {
+          function updateMarkers() {
+               markerClusterGroup.clearLayers();
+               for (const category in geoData) {
+               if (document.querySelector(`.category-filter[value="${category}"]`).checked) {
                     geoData[category].forEach(function(p) {
-                      var marker = L.circleMarker([p.latitude, p.longitude], {
-                        radius: 6,
-                        fillColor: dynamicCategoryColors[category] || 'grey',
-                        color: "#000",
-                        weight: 0.5,
-                        opacity: 1,
-                        fillOpacity: 0.8
-                      }).bindPopup(`<strong>${category}</strong>`);
-                      markerClusterGroup.addLayer(marker);
+                    var marker = L.circleMarker([p.latitude, p.longitude], {
+                    radius: 6,
+                    fillColor: dynamicCategoryColors[category] || 'grey',
+                    color: "#000",
+                    weight: 0.5,
+                    opacity: 1,
+                    fillOpacity: 0.8
+                    }).bindPopup(`<strong>${category}</strong>`);
+                    markerClusterGroup.addLayer(marker);
                     });
-                  }
-                }
-              }
-              updateMarkers();
-              map.addLayer(markerClusterGroup);
+               }
+               }
+          }
+          updateMarkers();
+          map.addLayer(markerClusterGroup);
 
-              document.querySelectorAll('.category-filter').forEach(cb => cb.addEventListener('change', updateMarkers));
+          document.querySelectorAll('.category-filter').forEach(cb => cb.addEventListener('change', updateMarkers));
 
-              // --- Logika Heatmap & Clustering ---
-              var heatmapPoints = [];
-              for (const category in geoData) {
-                geoData[category].forEach(p => heatmapPoints.push([p.latitude, p.longitude, 0.6]));
-              }
-              var heatLayer = L.heatLayer(heatmapPoints, {
-                radius: 30, blur: 15, maxZoom: 17,
-                gradient: { 0.3: "#00bfff", 0.6: "#ffc107", 1.0: "#dc3545" }
-              });
+          // --- Logika Heatmap & Clustering ---
+          var heatmapPoints = [];
+          for (const category in geoData) {
+               geoData[category].forEach(p => heatmapPoints.push([p.latitude, p.longitude, 0.6]));
+          }
+          var heatLayer = L.heatLayer(heatmapPoints, {
+               radius: 30, blur: 15, maxZoom: 17,
+               gradient: { 0.3: "#00bfff", 0.6: "#ffc107", 1.0: "#dc3545" }
+          });
 
-              let heatmapActive = false;
-              document.getElementById('toggleHeatmap').addEventListener('click', function() {
-                if (heatmapActive) {
-                  map.removeLayer(heatLayer);
-                  this.classList.remove('btn-danger');
-                  this.classList.add('btn-outline-danger');
-                } else {
-                  map.addLayer(heatLayer);
-                  this.classList.add('btn-danger');
-                  this.classList.remove('btn-outline-danger');
-                }
-                heatmapActive = !heatmapActive;
-              });
+          let heatmapActive = false;
+          document.getElementById('toggleHeatmap').addEventListener('click', function() {
+               if (heatmapActive) {
+               map.removeLayer(heatLayer);
+               this.classList.remove('btn-danger');
+               this.classList.add('btn-outline-danger');
+               } else {
+               map.addLayer(heatLayer);
+               this.classList.add('btn-danger');
+               this.classList.remove('btn-outline-danger');
+               }
+               heatmapActive = !heatmapActive;
+          });
 
-              let clusterActive = true;
-              document.getElementById('toggleCluster').addEventListener('click', function() {
-                if (clusterActive) {
-                  map.removeLayer(markerClusterGroup);
-                  this.classList.remove('btn-primary');
-                  this.classList.add('btn-outline-primary');
-                } else {
-                  map.addLayer(markerClusterGroup);
-                  this.classList.add('btn-primary');
-                  this.classList.remove('btn-outline-primary');
-                }
-                clusterActive = !clusterActive;
-              });
+          let clusterActive = true;
+          document.getElementById('toggleCluster').addEventListener('click', function() {
+               if (clusterActive) {
+               map.removeLayer(markerClusterGroup);
+               this.classList.remove('btn-primary');
+               this.classList.add('btn-outline-primary');
+               } else {
+               map.addLayer(markerClusterGroup);
+               this.classList.add('btn-primary');
+               this.classList.remove('btn-outline-primary');
+               }
+               clusterActive = !clusterActive;
+          });
 
-              /* ===========================
-                 WORD CLOUD
-                 =========================== */
-              const wordData = [];
-              for (const category in results.text_analysis) {
-                results.text_analysis[category].forEach(keyword => {
-                  wordData.push([keyword, Math.floor(Math.random() * 40) + 10]);
-                });
-              }
+          /* ===========================
+               WORD CLOUD
+               =========================== */
+          const wordData = [];
+          for (const category in results.text_analysis) {
+               results.text_analysis[category].forEach(keyword => {
+               wordData.push([keyword, Math.floor(Math.random() * 40) + 10]);
+               });
+          }
 
-              if(wordData.length > 0) {
-                WordCloud(document.getElementById('wordCloudCanvas'), {
-                  list: wordData,
-                  gridSize: 8,
-                  weightFactor: 3,
-                  fontFamily: 'Verdana, sans-serif',
-                  color: 'random-dark',
-                  backgroundColor: 'transparent',
-                  rotateRatio: 0.5
-                });
-              }
-            }
+          if(wordData.length > 0) {
+               WordCloud(document.getElementById('wordCloudCanvas'), {
+               list: wordData,
+               gridSize: 8,
+               weightFactor: 3,
+               fontFamily: 'Verdana, sans-serif',
+               color: 'random-dark',
+               backgroundColor: 'transparent',
+               rotateRatio: 0.5
+               });
+          }
+          }
 
      const positifData = {{ results.sentiment_wordcloud.positif | tojson | safe }};
      const negatifData = {{ results.sentiment_wordcloud.negatif | tojson | safe }};
 
      // WordCloud Positif
      if (positifData.length > 0) {
-         WordCloud(document.getElementById('wordCloudPositif'), {
-             list: positifData,
-             gridSize: 8,
-             weightFactor: 3,
-             fontFamily: 'Verdana, sans-serif',
-             color: 'random-dark',
-             backgroundColor: 'transparent',
-             rotateRatio: 0.5
-         });
+     WordCloud(document.getElementById('wordCloudPositif'), {
+          list: positifData,
+          gridSize: 8,
+          weightFactor: 3,
+          fontFamily: 'Verdana, sans-serif',
+          color: 'random-dark',
+          backgroundColor: 'transparent',
+          rotateRatio: 0.5
+     });
      } else {
-         console.log("Tidak ada data sentimen positif");
+     console.log("Tidak ada data sentimen positif");
      }
 
      // WordCloud Negatif
      if (negatifData.length > 0) {
-         WordCloud(document.getElementById('wordCloudNegatif'), {
-             list: negatifData,
-             gridSize: 8,
-             weightFactor: 3,
-             fontFamily: 'Verdana, sans-serif',
-             color: 'random-dark',
-             backgroundColor: 'transparent',
-             rotateRatio: 0.5
-         });
+     WordCloud(document.getElementById('wordCloudNegatif'), {
+          list: negatifData,
+          gridSize: 8,
+          weightFactor: 3,
+          fontFamily: 'Verdana, sans-serif',
+          color: 'random-dark',
+          backgroundColor: 'transparent',
+          rotateRatio: 0.5
+     });
      } else {
-         console.log("Tidak ada data sentimen negatif");
+     console.log("Tidak ada data sentimen negatif");
      }
 
 

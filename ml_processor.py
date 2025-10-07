@@ -203,9 +203,9 @@ def run_sentiment_wordcloud(df):
 def run_full_analysis(start_date=None, end_date=None):
     # Daftar warna untuk visualisasi per kategori
     WARNA_PALET = [
-        "rgba(239, 83, 80, 0.8)","rgba(66, 165, 245, 0.8)","rgba(255, 183, 77, 0.8)",
-        "rgba(102, 187, 106, 0.8)","rgba(171, 71, 188, 0.8)","rgba(255, 238, 88, 0.8)",
-        "rgba(29, 233, 182, 0.8)","rgba(121, 85, 72, 0.8)","rgba(120, 144, 156, 0.8)"
+        "#20c997","#ffc107","#d63384",
+        "#fd7e14","#0dcaf0","#dc3545",
+        "#0d6efd","#664d03","#6f42c1"
     ]
     df = load_data_from_db(start_date=start_date, end_date=end_date)
     try:

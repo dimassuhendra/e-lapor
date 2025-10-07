@@ -5,6 +5,35 @@
 {% block page_title %}Dashboard{% endblock %}
 
 {% block content %}
+<div class="row mb-3">
+    <div class="col-md-12">
+        <div class="card shadow-sm h-100 p-5">
+            <h5 class="card-title text-center mb-3">% Pencapaian Proses Laporan Masuk</h5>
+            <div class="row">
+                <div class="col-6 d-flex flex-column align-items-center">
+                    <canvas id="chartDiproses" width="150" height="150"></canvas>
+                    <p id="explanationDiproses" class="mt-4 text-sm text-gray-600 text-center"></p>
+                </div>
+                <div class="col-6 d-flex flex-column align-items-center">
+                    <canvas id="chartSelesai" width="150" height="150"></canvas>
+                    <p id="explanationSelesai" class="mt-4 text-sm text-gray-600 text-center"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- <div class="col-md-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">Laporan Selesai</h5>
+                <p class="card-text fw-bold fs-2 text-success">{{ stats.selesai }}</p>
+                <canvas id="chartSelesai" width="150" height="150"></canvas>
+            </div>
+            <p id="explanationSelesai" class="mt-4 text-sm text-gray-600 text-center"></p>
+        </div>
+    </div> -->
+</div>
+
 <!-- Kartu Statistik Berdasarkan Status -->
 <div class="row mb-4">
     <div class="col-md-4">
@@ -224,6 +253,156 @@
 
 {% block scripts %}
 <script>
+    // const diterima = parseInt("{{ stats.diterima }}"); // Total (100%)
+    // const diproses = parseInt("{{ stats.diproses }}");
+    // const selesai = parseInt("{{ stats.selesai }}");
+
+    // 2. Data untuk Chart "Diproses"
+    const stats = {
+            diterima: parseInt("{{ stats.diterima }}"), // Total Laporan Diterima (Dasar 100%)
+            diproses: parseInt("{{ stats.diproses }}"), // Laporan yang sudah masuk proses
+            selesai: parseInt("{{ stats.selesai }}")     // Laporan yang sudah selesai/ditutup
+        };
+
+        // 1. Ambil Nilai dari Data Mock
+        const diterima = stats.diterima;
+        const diproses = stats.diproses;
+        const selesai = stats.selesai;
+
+        // --- CHART.JS CUSTOM PLUGIN UNTUK TEKS DI TENGAH ---
+        const centerTextPlugin = {
+            id: 'centerText',
+            beforeDraw(chart) {
+                const { ctx, chartArea: { top, width, height }, config } = chart;
+                ctx.save();
+                
+                // Ambil nilai persentase dari konfigurasi data (misalnya data index 0 dibagi total)
+                const data = config.data.datasets[0].data;
+                const currentValue = data[0];
+                const totalValue = data[0] + data[1];
+                const percentage = totalValue > 0 ? ((currentValue / totalValue) * 100).toFixed(0) : 0;
+                
+                const text = `${percentage}%`;
+                
+                // Konfigurasi Font
+                ctx.font = 'bolder 24px Inter, sans-serif';
+                ctx.fillStyle = '#1f2937'; // Warna abu-abu gelap
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                // Hitung posisi tengah
+                const centerX = width / 2;
+                const centerY = top + (height / 2);
+                
+                // Gambar Teks
+                ctx.fillText(text, centerX, centerY);
+                ctx.restore();
+            }
+        };
+
+        // --- FUNGSI UNTUK MENYIAPKAN DATA DAN KONFIGURASI ---
+
+        // Fungsi untuk menghasilkan teks penjelasan dinamis
+        function generateExplanation(currentValue, totalValue, status) {
+            if (totalValue === 0) {
+                return `Belum ada laporan yang diterima untuk memulai proses ${status}.`;
+            }
+            const percentage = ((currentValue / totalValue) * 100).toFixed(1);
+            const remaining = totalValue - currentValue;
+
+            if (remaining < 0) {
+                 return `Terdapat **${currentValue}** laporan ${status} dari total **${totalValue}** laporan diterima. (Data mungkin inkonsisten)`;
+            }
+
+            if (status === 'Diproses') {
+                return `Dari **${totalValue}** laporan diterima, **${currentValue}** (${percentage}%) sedang **${status}**, menyisakan **${remaining}** yang belum disentuh.`;
+            } else if (status === 'Selesai') {
+                 return `Dari **${totalValue}** laporan diterima, **${currentValue}** (${percentage}%) telah **${status}**, menunjukkan efisiensi penyelesaian.`;
+            }
+            return '';
+        }
+
+        // Fungsi untuk membuat objek konfigurasi chart
+        const createChartConfig = (label, data, colors, status) => {
+            return {
+                type: 'doughnut',
+                data: {
+                    labels: [
+                        label,
+                        `Sisa Belum ${status}` // Sisa dari Total (Diterima)
+                    ],
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors,
+                        borderWidth: 0,
+                        hoverOffset: 8
+                    }]
+                },
+                options: {
+                    cutout: '80%', // Lebih besar untuk memuat teks
+                    responsive: false,
+                    maintainAspectRatio: false,
+                    aspectRatio: 1,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.parsed;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((value / total) * 100).toFixed(1) + '%';
+                                    return `${context.label}: ${value} (${percentage})`;
+                                }
+                            }
+                        }
+                    }
+                },
+                plugins: [centerTextPlugin] // Tambahkan plugin teks
+            };
+        };
+
+        // --- INISIALISASI CHART DAN PENJELASAN ---
+
+        // 1. Chart "Diproses"
+        const sisaBelumDiproses = diterima - diproses;
+        const dataDiproses = [diproses, sisaBelumDiproses];
+        const colorsDiproses = ['#3b82f6', '#e5e7eb']; // Biru (Diproses), Abu-abu (Sisa)
+        
+        const configDiproses = createChartConfig(
+            'Diproses', 
+            dataDiproses, 
+            colorsDiproses, 
+            'Diproses'
+        );
+
+        new Chart(
+            document.getElementById('chartDiproses'),
+            configDiproses
+        );
+
+        // Update teks penjelasan Diproses
+        document.getElementById('explanationDiproses').innerHTML = generateExplanation(diproses, diterima, 'Diproses').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        
+        // 2. Chart "Selesai"
+        const sisaBelumSelesai = diterima - selesai;
+        const dataSelesai = [selesai, sisaBelumSelesai];
+        const colorsSelesai = ['#10b981', '#e5e7eb']; // Hijau (Selesai), Abu-abu (Sisa)
+
+        const configSelesai = createChartConfig(
+            'Selesai', 
+            dataSelesai, 
+            colorsSelesai, 
+            'Selesai'
+        );
+
+        new Chart(
+            document.getElementById('chartSelesai'),
+            configSelesai
+        );
+        
+        // Update teks penjelasan Selesai
+        document.getElementById('explanationSelesai').innerHTML = generateExplanation(selesai, diterima, 'Selesai').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
 document.addEventListener('DOMContentLoaded', function() {
     const selectAll = document.getElementById('select-all');
     const checkboxes = document.querySelectorAll('.report-checkbox');
