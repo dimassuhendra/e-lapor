@@ -172,7 +172,7 @@ def login_required(f):
 @app.route('/')
 def index():
     laporan_page = request.args.get('laporan_page', 1, type=int)
-    laporan_per_page = 10
+    laporan_per_page = 30
     laporan_offset = (laporan_page - 1) * laporan_per_page
     pengumuman_page = request.args.get('pengumuman_page', 1, type=int)
     pengumuman_per_page = 5

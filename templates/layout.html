@@ -183,6 +183,9 @@
                .footer a:hover {
                     color: var(--light-text);
                }
+               .footer-information {
+                    text-align: justify;
+               }
           </style>
      </head>
      <body>
@@ -222,8 +225,38 @@
                </div>
           </main>
 
-          <footer class="footer bg-dark text-white text-center py-3 mt-auto">
-               <div class="container">
+          <footer class="footer bg-dark text-white text-center mt-auto">
+               <div class="container d-flex flex-column justify-content-center">
+                    <div class="row d-flex justify-content-between align-items-center mt-5 mb-3 lh-lg">
+                         <div class="col text-start">
+                              <strong>E-Lapor</strong>
+                              <p class="footer-information">Layanan Pengaduan Masyarakat Kota Bandar Lampung Media resmi untuk menyampaikan aspirasi, laporan, dan pengaduan Anda kepada Pemerintah Kota Bandar Lampung.</p>
+                         </div>
+                         <div class="col text-start d-flex justify-content-center">
+                              <ul class="list-unstyled text-start">
+                                   <li><a href="{{ url_for('lapor') }}" target="_blank" rel="noopener noreferrer" class="text-decoration-none">Buat Laporan Baru</a></li>
+                                   <li><a href="#" target="_blank" rel="noopener noreferrer" class="text-decoration-none">Lacak Laporan</a></li>
+                                   <li><a href="#" target="_blank" rel="noopener noreferrer" class="text-decoration-none">Statistik Laporan</a></li>
+                                   <li><a href="#" target="_blank" rel="noopener noreferrer" class="text-decoration-none">FAQ</a></li>
+                              </ul>
+                         </div>
+                         <div class="col">
+                              <table border="0" class="text-start">
+                                   <tr>
+                                        <td><strong>Dinas Komunikasi dan Informatika</strong></td>
+                                   </tr>
+                                   <tr>
+                                        <td>Kota Bandar Lampung</td>
+                                   </tr>
+                                   <tr>
+                                        <td class="footer-information">Jalan Dokter Susilo No.2, Sumur Batu, Kec. Tlk. Betung Utara, Kota Bandar Lampung</td>
+                                   </tr>
+                                   <tr>
+                                        <td>35212</td>
+                                   </tr>
+                              </table>
+                         </div>
+                    </div>
                     <p class="mb-0">&copy; 2025 - Dinas Komunikasi dan Informasi Bandar Lampung</p>
                </div>
           </footer>
