@@ -16,12 +16,17 @@
           <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
           <style>
+               /* SKEMA WARNA BIRU MUDA TERANG / HIJAU AKSEH */
                :root {
-                    --primary-color: #006a4e; /* Hijau Tua Profesional */
-                    --secondary-color: #4a90e2; /* Biru sebagai Aksen */
-                    --light-bg: #fdfdff;
-                    --dark-text: #343a40;
-                    --light-text: #ffffff;
+                    --primary-light: #f0f8ff; /* Biru Muda Sangat Terang (Untuk Background Halaman) */
+                    --secondary-blue: #1e88e5; /* Biru Cerah (Untuk Navbar, Footer, Aksen) */
+                    --accent-green: #00897b; /* Hijau Teal (Untuk Tombol dan Sorotan) */
+                    --dark-text: #343a40; /* Teks Utama Gelap */
+                    --sub-text: #6c757d; /* Abu-abu untuk sub-teks */
+
+                    /* Variabel asli Hero dipertahankan untuk gradien overlay */
+                    --primary-color: #006a4e;
+                    --secondary-color: #4a90e2;
                     --font-family-main: "Poppins", sans-serif;
                }
 
@@ -30,184 +35,218 @@
                     display: flex;
                     flex-direction: column;
                     min-height: 100vh;
+                    background-color: var(--primary-light); /* Background body terang */
+                    color: var(--dark-text); /* Warna teks utama di body menjadi gelap */
                     width: 100%;
                     margin: 0 !important;
                     padding: 0 !important;
                     gap: 0 !important;
                }
 
+               .utama {
+                    padding: 0 !important;
+                    background-color: var(--primary-light);
+                    color: var(--dark-text);
+               }
+
                main {
                     flex: 1;
                }
 
-               /* Navbar Modern */
+               /* --- Navbar (Biru Cerah) --- */
                .navbar {
-                    background-color: var(--light-text);
-                    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+                    background-color: var(--secondary-blue);
+                    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
                     padding: 0.8rem 0;
                }
 
-               .navbar-brand img {
-                    height: 40px;
-                    width: auto;
-                    margin-right: 12px;
-               }
-
+               /* Warna Brand Navbar */
                .navbar-title .main-title {
                     font-weight: 700;
-                    color: var(--primary-color);
-                    font-size: 1.5rem;
+                    color: #ffffff; /* Putih */
+                    font-size: 1.3rem;
                }
 
                .navbar-title .sub-title {
-                    font-size: 0.85rem;
-                    color: #6c757d;
+                    font-size: 0.75rem;
+                    color: #e0e0e0; /* Putih sedikit abu-abu */
                     display: block;
                     line-height: 1;
                }
 
+               /* Warna Link Navbar */
                .nav-link {
                     font-weight: 500;
-                    color: var(--dark-text);
+                    color: #ffffff;
                     transition: color 0.3s ease;
                }
 
                .nav-link:hover {
-                    color: var(--primary-color);
+                    color: var(--accent-green); /* Hover ke warna aksen hijau */
                }
 
-               /* Tombol "Buat Laporan" di Navbar */
-               .navbar .btn {
-                    background-color: var(--primary-color);
-                    border-color: var(--primary-color);
-                    font-weight: 600;
+               .btn-submit-elegant {
+                    background-color: #8be9fd;
+                    border-color: #8be9fd;
+                    color: #172a3a;
+                    font-weight: bold;
+                    transition: all 0.3s;
                     border-radius: 50rem;
-                    transition: all 0.3s ease;
-                    padding: 8px 20px;
+                    padding: 6px 16px;
+               }
+               .btn-submit-elegant:hover {
+                    background-color: #a3f4ff;
+                    border-color: #a3f4ff;
+                    color: #172a3a;
+               }
+               /* --- End Navbar --- */
+
+               /* Penyesuaian Flash Messages (dipertahankan standar, karena body terang) */
+               .alert {
+                    border: none;
+                    border-radius: 0.5rem;
                }
 
-               .navbar .btn:hover {
-                    background-color: #00563f;
-                    border-color: #00563f;
-                    transform: translateY(-2px);
-                    box-shadow: 0 4px 15px rgba(0, 106, 78, 0.2);
-               }
-
-               .utama {
-                    padding: 0 !important;
-               }
-
-               /* Section Hero */
+               /* --- Hero Section (Latar belakang gambar dipertahankan, tapi transisi gradien disesuaikan ke warna terang) --- */
                .section#hero {
-                    background-image: linear-gradient(to right, #4a90e299, #006a4e99, #ffffff99), url("../static/img/bg2.jpg");
+                    /* Konfigurasi background image asli yang dipertahankan */
+                    background-image: linear-gradient(to right, #4a90e2aa, #006a4eaa, #ffffffaa), url("{{ url_for('static', filename='img/bg2.jpg') }}");
                     background-repeat: no-repeat;
                     background-size: cover;
                     background-position: center;
                     display: flex;
                     flex-direction: column;
-                    justify-content: flex-end;
-                    margin: 0 !important;
-                    flex-grow: 1;
-               }
-               #hero wave {
-                    margin-bottom: auto !important;
-               }
-               #peta {
-                    min-height: 50vh;
-                    background-color: #f8f9fa;
-               }
-               /* Kustomisasi Kartu Laporan */
-               .laporan-card {
-                    border: none;
-                    border-radius: 1.25rem;
-                    transition: transform 0.3s ease, box-shadow 0.3s ease;
+                    justify-content: center;
+                    min-height: 60vh;
+                    position: relative;
+                    z-index: 1;
                     overflow: hidden;
-                    text-decoration: none;
                }
-
-               .laporan-card:hover {
-                    transform: translateY(-5px);
-                    box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175) !important;
+               /* Mengubah transisi gradien agar transisi ke warna body terang */
+               .section#hero::after {
+                    content: "";
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100px;
+                    /* PERUBAHAN UTAMA: Transisi dari transparan ke warna body terang */
+                    background: linear-gradient(to top, var(--primary-light), rgba(255, 255, 255, 0));
+                    z-index: 2;
                }
-
-               .laporan-card .card-body {
-                    padding: 1.5rem;
-                    display: flex;
-                    flex-direction: column;
+               .section#hero .container {
+                    position: relative;
+                    z-index: 3;
                }
-
-               .laporan-card .card-title {
-                    font-size: 1rem; /* Ukuran font judul diperkecil */
-                    font-weight: 700;
-                    margin-bottom: 0.5rem;
+               /* Pastikan teks di hero terlihat jelas (putih dengan shadow) */
+               .section#hero h1,
+               .section#hero p {
+                    color: var(--primary-light);
+                    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
                }
+               /* --- End Hero Section --- */
 
-               .laporan-card .card-subtitle {
-                    font-size: 0.85rem; /* Ukuran font sub-judul diperkecil */
-                    margin-bottom: 0.75rem;
-               }
-
-               .laporan-card .card-text {
-                    font-size: 0.8rem; /* Ukuran font deskripsi diperkecil agar tidak terpotong */
+               /* Kustomisasi Card Laporan di konten utama agar terlihat di background terang */
+               .laporan-card {
+                    background-color: #ffffff; /* Card dibuat putih */
+                    border: 1px solid #dee2e6;
                     color: var(--dark-text);
-                    line-height: 1.5;
-                    flex-grow: 1; /* Pastikan mengambil sisa ruang */
-                    /* Hapus properti 'truncate' di Jinja2, karena sudah tidak perlu */
+                    transition: transform 0.2s, box-shadow 0.2s;
+               }
+               .laporan-card:hover {
+                    transform: translateY(-3px);
+                    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+               }
+               .laporan-card .card-title {
+                    color: var(--secondary-blue); /* Judul Card Biru Cerah */
+               }
+               .laporan-card .card-text {
+                    font-size: 0.8rem;
                     display: -webkit-box;
-                    -webkit-line-clamp: 5; /* Batasi hingga 5 baris, Anda bisa ubah */
+                    -webkit-line-clamp: 5;
                     -webkit-box-orient: vertical;
                     overflow: hidden;
                     text-overflow: ellipsis;
+                    color: var(--sub-text);
+               }
+               .laporan-card .btn-primary {
+                    background-color: var(--accent-green);
+                    border-color: var(--accent-green);
+                    color: #ffffff;
+               }
+               .laporan-card .btn-primary:hover {
+                    background-color: #00a896;
+                    border-color: #00a896;
+               }
+               /* Memastikan semua konten di dalam `main` terlihat jelas */
+               .container {
+                    color: var(--dark-text);
                }
 
-               .laporan-card .badge {
-                    font-size: 0.75rem; /* Ukuran font status diperkecil */
-               }
-               .update {
-                    border-bottom: 4px solid;
-                    border-color: black;
-                    border-radius: 30%;
-               }
-               /* Footer */
+               /* --- Footer (Biru Cerah) --- */
                .footer {
-                    background-color: #2c3e50; /* Warna gelap yang elegan */
+                    background-color: var(--secondary-blue);
+                    color: #ffffff;
                     padding: 40px 0;
+                    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.1);
                }
 
-               .footer p,
-               .footer a {
-                    color: #bdc3c7;
-                    text-decoration: none;
+               .footer strong {
+                    color: var(--accent-green); /* Aksen Hijau */
                }
 
-               .footer a:hover {
-                    color: var(--light-text);
-               }
                .footer-information {
-                    text-align: justify;
+                    color: #e0e0e0;
+                    text-align: center;
+                    font-size: 0.9rem;
+               }
+
+               .footer-link a {
+                    text-decoration: none;
+                    color: #e0e0e0;
+                    transition: color 0.2s;
+               }
+               .footer-link a:hover {
+                    color: #a3f4ff;
+               }
+
+               /* Penyesuaian copyright */
+               .footer .border-secondary {
+                    border-color: rgba(255, 255, 255, 0.3) !important;
+               }
+
+               /* Penyesuaian di layar lebih besar (Desktop) - dipertahankan */
+               @media (min-width: 992px) {
+                    .navbar-brand img {
+                         height: 40px;
+                         margin-right: 12px;
+                    }
+                    .navbar-title .main-title {
+                         font-size: 1.5rem;
+                    }
+                    .navbar-title .sub-title {
+                         font-size: 0.85rem;
+                    }
                }
           </style>
      </head>
      <body>
-          <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+          <nav class="navbar navbar-expand-lg sticky-top">
                <div class="container">
                     <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
-                         <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo Bandar Lampung" />
+                         <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo Bandar Lampung" class="img-fluid me-2" style="max-height: 40px; width: auto" />
                          <div class="navbar-title">
                               <span class="main-title">Lapor!</span>
                               <span class="sub-title">Pemerintah Kota Bandar Lampung</span>
                          </div>
                     </a>
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                          <span class="navbar-toggler-icon"></span>
                     </button>
                     <div class="collapse navbar-collapse" id="navbarNav">
-                         <ul class="navbar-nav ms-auto align-items-center">
-                              <li class="nav-item">
-                                   <a class="nav-link" href="{{ url_for('index') }}">Peta Laporan</a>
-                              </li>
+                         <ul class="navbar-nav ms-auto align-items-lg-center">
                               <li class="nav-item ms-lg-3">
-                                   <a class="nav-link btn btn-success text-white px-3" href="{{ url_for('lapor') }}"> <i class="bi bi-megaphone-fill me-2"></i>Buat Laporan Baru </a>
+                                   <a class="nav-link btn btn-submit-elegant px-3 w-100 w-lg-auto" href="{{ url_for('lapor') }}"> <i class="bi bi-megaphone-fill me-2"></i>Buat Laporan Baru </a>
                               </li>
                          </ul>
                     </div>
@@ -216,48 +255,56 @@
 
           <main>
                <div class="container-fluid utama">
-                    {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %} {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                         {{ message }}
-                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %}
+                    <div class="container mt-4 mb-2">
+                         {% for category, message in messages %}
+                         <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                              {{ message }}
+                              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                         </div>
+                         {% endfor %}
                     </div>
-                    {% endfor %} {% endif %} {% endwith %} {% block content %}{% endblock %}
+                    {% endif %} {% endwith %} {% block content %}{% endblock %}
                </div>
           </main>
 
-          <footer class="footer bg-dark text-white text-center mt-auto">
-               <div class="container d-flex flex-column justify-content-center">
-                    <div class="row d-flex justify-content-between align-items-center mt-5 mb-3 lh-lg">
-                         <div class="col text-start">
-                              <strong>E-Lapor</strong>
+          <footer class="footer mt-auto">
+               <div class="container h-100">
+                    <div class="row g-4 d-flex align-items-center justify-content-around mt-3 mb-5 lh-lg">
+                         <div class="col-12 col-md-4 text-center">
+                              <strong style="color: #8be9fd">E-Lapor</strong>
                               <p class="footer-information">Layanan Pengaduan Masyarakat Kota Bandar Lampung Media resmi untuk menyampaikan aspirasi, laporan, dan pengaduan Anda kepada Pemerintah Kota Bandar Lampung.</p>
                          </div>
-                         <div class="col text-start d-flex justify-content-center">
-                              <ul class="list-unstyled text-start">
-                                   <li><a href="{{ url_for('lapor') }}" target="_blank" rel="noopener noreferrer" class="text-decoration-none">Buat Laporan Baru</a></li>
-                                   <li><a href="#" target="_blank" rel="noopener noreferrer" class="text-decoration-none">Lacak Laporan</a></li>
-                                   <li><a href="#" target="_blank" rel="noopener noreferrer" class="text-decoration-none">Statistik Laporan</a></li>
-                                   <li><a href="#" target="_blank" rel="noopener noreferrer" class="text-decoration-none">FAQ</a></li>
-                              </ul>
-                         </div>
-                         <div class="col">
-                              <table border="0" class="text-start">
+                         <div class="col-12 col-md-4 text-center">
+                              <table border="0" class="text-center">
                                    <tr>
-                                        <td><strong>Dinas Komunikasi dan Informatika</strong></td>
+                                        <td><strong style="color: #8be9fd">Dinas Komunikasi dan Informatika</strong></td>
                                    </tr>
                                    <tr>
-                                        <td>Kota Bandar Lampung</td>
+                                        <td class="footer-information">Kota Bandar Lampung</td>
                                    </tr>
                                    <tr>
                                         <td class="footer-information">Jalan Dokter Susilo No.2, Sumur Batu, Kec. Tlk. Betung Utara, Kota Bandar Lampung</td>
                                    </tr>
                                    <tr>
-                                        <td>35212</td>
+                                        <td class="footer-information">35212</td>
                                    </tr>
                               </table>
                          </div>
+                         <div class="col-12 col-md-4 text-start d-flex flex-column text-center">
+                              <ul class="list-unstyled footer-link">
+                                   <li><a href="{{ url_for('lapor') }}" target="_blank" rel="noopener noreferrer" class="text-decoration-none">Buat Laporan Baru</a></li>
+                                   <li><a href="#" target="_blank" rel="noopener noreferrer" class="text-decoration-none">Lacak Laporan</a></li>
+                                   <li><a href="#" rel="noopener noreferrer" class="text-decoration-none">Statistik Laporan</a></li>
+                                   <li><a href="#" target="_blank" rel="noopener noreferrer" class="text-decoration-none">FAQ</a></li>
+                              </ul>
+                         </div>
                     </div>
-                    <p class="mb-0">&copy; 2025 - Dinas Komunikasi dan Informasi Bandar Lampung</p>
+                    <div class="row pt-3 border-top border-secondary">
+                         <div class="col-12 text-center">
+                              <p class="mb-0 small py-2" style="color: #e0e0e0">&copy; 2025 - Dinas Komunikasi dan Informasi Bandar Lampung</p>
+                         </div>
+                    </div>
                </div>
           </footer>
 

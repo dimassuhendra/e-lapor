@@ -1,184 +1,332 @@
 {% extends "layout.html" %}
-{% block title %}Buat Laporan Baru{% endblock %}
+{% block title %}Buat Laporan Baru Split Screen{% endblock %}
 
 {% block content %}
-<div class="container my-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card shadow-sm border-0">
-                <div class="card-body p-4 p-md-5">
-                    <h2 class="card-title text-center mb-4">Form Laporan Warga</h2>
-                    
-                    {% with messages = get_flashed_messages(with_categories=true) %}
-                        {% if messages %}
-                            {% for category, message in messages %}
-                            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                                {{ message }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                            {% endfor %}
-                        {% endif %}
-                    {% endwith %}
+<style>
+    /* --- STYLING UTAMA (Tetap) --- */
+    body {
+        background-color: #0b1a2b;
+    }
+    .form-center-container {
+        /* Memastikan konten form mengisi ruang secara vertikal di layar besar */
+        min-height: 100vh;
+        display: flex; 
+        align-items: center; 
+        justify-content: center;
+        padding: 40px 0;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+    }
+    .split-form-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        border-radius: 1.5rem;
+        overflow: hidden; 
+        box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+        /* Penting: Set lebar untuk tampilan desktop/tablet besar */
+        width: 90%; 
+    }
+    /* Bagian Copywriting (Kiri) - Dipertahankan */
+    .copywriting-panel {
+        background-color: #172a3a;
+        color: #ffffff;
+        padding: 5rem 3rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+    .copywriting-panel h2 {
+        color: #8be9fd;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+    .copywriting-panel p {
+        color: #a0aec0;
+        font-size: 0.95rem;
+    }
+    .copywriting-icon {
+        font-size: 5rem;
+        color: #8be9fd;
+        margin-bottom: 2rem;
+    }
+    /* Bagian Form (Kanan) - Dipertahankan */
+    .form-panel {
+        background-color: #ffffff; 
+        padding: 4rem;
+    }
+    .form-panel .form-title { /* Menggunakan class asli Anda */
+        color: #172a3a;
+        font-weight: 600;
+        border-bottom: 2px solid #8be9fd;
+        display: inline-block;
+        padding-bottom: 5px;
+        margin-bottom: 2rem;
+    }
+    .form-control, .form-select {
+        border-radius: 0.5rem;
+        border-color: #e2e8f0;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #8be9fd;
+        box-shadow: 0 0 0 0.25rem rgba(139, 233, 253, 0.4);
+    }
+    .btn-submit-elegant {
+        background-color: #8be9fd; 
+        border-color: #8be9fd;
+        color: #172a3a;
+        font-weight: bold;
+        transition: all 0.3s;
+    }
+    .btn-submit-elegant:hover {
+        background-color: #a3f4ff;
+        border-color: #a3f4ff;
+        color: #172a3a;
+    }
+    #map {
+        height: 300px !important;
+        border-radius: 0.5rem !important;
+        border: 1px solid #e2e8f0; 
+    }
 
-                    <form method="POST" enctype="multipart/form-data" id="laporForm">
-                        <div class="row g-3">
-                            <!-- Nama Pelapor -->
-                            <div class="col-md-6">
-                                <label for="nama_pelapor" class="form-label">Nama Pelapor <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="nama_pelapor" name="nama_pelapor" value="{{ form_data.nama_pelapor or '' }}" required>
-                            </div>
+    /* --- REFACTORING MEDIA QUERIES UNTUK RESPONSIVITAS --- */
+    
+    /* Pada perangkat tablet (lebar < 992px) */
+    @media (max-width: 991.98px) {
+        .form-center-container {
+            /* Hapus align-items: center; agar konten form mengisi atas ke bawah */
+            align-items: flex-start;
+            padding: 20px 0; /* Kurangi padding vertikal */
+        }
+        .split-form-container {
+            /* Hapus max-width untuk mengisi layar */
+            max-width: none;
+            width: 100%; /* Mengisi lebar penuh */
+            border-radius: 0; /* Hapus border-radius */
+            box-shadow: none; /* Hapus bayangan */
+        }
+        .copywriting-panel {
+            padding: 3rem 2rem; /* Kurangi padding di tablet */
+        }
+        .form-panel {
+             padding: 3rem 1.5rem; /* Kurangi padding di tablet */
+        }
+    }
 
-                            <!-- Nomor WhatsApp (Opsional) -->
-                            <div class="col-md-6">
-                                <label for="no_whatsapp" class="form-label">No. WhatsApp (Opsional)</label>
-                                <input type="tel" class="form-control" id="no_whatsapp" name="no_whatsapp" value="{{ form_data.no_whatsapp or '' }}" placeholder="Contoh: 081234567890">
-                            </div>
+    /* Pada perangkat HP (lebar < 768px) */
+    @media (max-width: 767.98px) {
+        /* Form dan Copywriting akan ditumpuk secara otomatis karena menggunakan col-md-6 */
+        
+        /* Mengatur .form-center-container di HP */
+        .form-center-container {
+            padding: 0; /* Hapus padding agar form menempel ke tepi atas/bawah */
+        }
+        .form-title {
+            text-align: center;
+            width: 100%;
+            margin-top: 2rem;
+        }
+        
+        /* Menyembunyikan Copywriting panel di HP untuk pengalaman yang lebih ringkas */
+        .copywriting-panel {
+            display: none !important; 
+        }
 
-                            <!-- Judul Laporan -->
-                            <div class="col-12">
-                                <label for="judul" class="form-label">Judul Laporan <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="judul" name="judul" value="{{ form_data.judul or '' }}" required>
-                            </div>
+        .form-panel {
+            padding: 2rem 1rem; /* Padding lebih kecil di HP */
+        }
+        
+        /* Memastikan Judul Form (yang sekarang berada di luar panel) tetap terlihat menonjol di HP */
+        .split-form-container > .form-title {
+            padding: 1.5rem 1rem 0 1rem; /* Tambahkan padding agar tidak menempel tepi */
+            display: block; /* Menjadikannya block agar menempati satu baris penuh */
+            font-size: 1.5rem;
+        }
+        .form-panel {
+            /* Menyesuaikan margin form-title di dalam form-panel jika Anda memutuskan memindahkannya di masa depan */
+            padding-top: 1rem;
+        }
+    }
+</style>
 
-                            <!-- Deskripsi Laporan -->
-                            <div class="col-12">
-                                <label for="deskripsi" class="form-label">Deskripsi Lengkap <span class="text-danger">*</span></label>
-                                <textarea class="form-control" id="deskripsi" name="deskripsi" rows="4" required>{{ form_data.deskripsi or '' }}</textarea>
-                            </div>
-                            
-                            <!-- Kategori Laporan -->
-                            <div class="col-12">
-                                <label for="kategori" class="form-label">Kategori Laporan <span class="text-danger">*</span></label>
-                                <select class="form-select" id="kategori" name="kategori_id" required>
-                                    <option selected disabled value="">Pilih Kategori...</option>
-                                    {% for kategori in kategori_list %}
-                                        <option value="{{ kategori.id }}" {% if form_data and form_data.kategori_id == kategori.id|string %}selected{% endif %}>
-                                            {{ kategori.nama_kategori }}
-                                        </option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-
-                            <!-- Peta dan Lokasi -->
-                            <div class="col-12">
-                                <label class="form-label">Lokasi Laporan <span class="text-danger">*</span></label>
-                                <div id="map" style="height: 300px; border-radius: 8px;" class="mb-2"></div>
-                                <small class="form-text text-muted">Klik pada peta untuk menentukan lokasi, atau geser pin yang sudah ada.</small>
-                            </div>
-
-                            <!-- Kecamatan & Kelurahan (Dropdown dinamis) -->
-                            <div class="col-md-6">
-                                <label for="kecamatan" class="form-label">Kecamatan <span class="text-danger">*</span></label>
-                                <select class="form-select" id="kecamatan" name="kecamatan" required>
-                                    <option selected disabled value="">Pilih Kecamatan...</option>
-                                    {% for kec in data_wilayah.keys()|sort %}
-                                        <option value="{{ kec }}" {% if form_data and form_data.kecamatan == kec %}selected{% endif %}>{{ kec }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="kelurahan" class="form-label">Kelurahan <span class="text-danger">*</span></label>
-                                <select class="form-select" id="kelurahan" name="kelurahan" required>
-                                    <option selected disabled value="">Pilih Kecamatan Dulu...</option>
-                                </select>
-                            </div>
-
-                            <!-- Input Latitude & Longitude (Tersembunyi) -->
-                            <input type="hidden" id="latitude" name="latitude" value="{{ form_data.latitude or '' }}" required>
-                            <input type="hidden" id="longitude" name="longitude" value="{{ form_data.longitude or '' }}" required>
-
-                            <!-- Unggah Foto (Opsional) -->
-                            <div class="col-12">
-                                <label for="foto" class="form-label">Unggah Foto (Opsional)</label>
-                                <input class="form-control" type="file" id="foto" name="foto" accept="image/png, image/jpeg, image/jpg">
-                            </div>
-                        </div>
-
-                        <div class="d-grid mt-4">
-                            <button type="submit" class="btn btn-primary btn-lg">Kirim Laporan</button>
-                        </div>
-                    </form>
+<div class="form-center-container">
+        
+    <h3 class="form-title text-center">
+        <i class="bi bi-megaphone me-2"></i> Buat Laporan Baru
+    </h3>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="mb-4">
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
+            {% endfor %}
             </div>
-        </div>
+        {% endif %}
+    {% endwith %}
+
+    <div class="col-md-9 form-panel bg-transparent d-flex align-items-center">
+        
+        <form method="POST" enctype="multipart/form-data" id="laporForm">
+            <div class="row g-4">
+                
+                <div class="col-md-6">
+                    <label for="nama_pelapor" class="form-label">Nama Pelapor <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="nama_pelapor" name="nama_pelapor" value="{{ form_data.nama_pelapor or '' }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="no_whatsapp" class="form-label">No. WhatsApp (Opsional)</label>
+                    <input type="tel" class="form-control" id="no_whatsapp" name="no_whatsapp" value="{{ form_data.no_whatsapp or '' }}" placeholder="Contoh: 0812xxxxxx">
+                </div>
+
+                <div class="col-12">
+                    <label for="judul" class="form-label">Judul Laporan <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="judul" name="judul" value="{{ form_data.judul or '' }}" required>
+                </div>
+
+                <div class="col-12">
+                    <label for="deskripsi" class="form-label">Deskripsi Lengkap <span class="text-danger">*</span></label>
+                    <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3" required>{{ form_data.deskripsi or '' }}</textarea>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="kategori" class="form-label">Kategori Laporan <span class="text-danger">*</span></label>
+                    <select class="form-select" id="kategori" name="kategori_id" required>
+                        <option selected disabled value="">Pilih Kategori...</option>
+                        {% for kategori in kategori_list %}
+                            <option value="{{ kategori.id }}" {% if form_data and form_data.kategori_id == kategori.id|string %}selected{% endif %}>
+                                {{ kategori.nama_kategori }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="foto" class="form-label">Unggah Foto (Opsional)</label>
+                    <input class="form-control" type="file" id="foto" name="foto" accept="image/png, image/jpeg, image/jpg">
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label mt-3">Lokasi Laporan <span class="text-danger">*</span></label>
+                    <div id="map" class="mb-2"></div>
+                    <small class="form-text text-muted">
+                        <i class="bi bi-info-circle me-1"></i> Klik pada peta atau geser pin untuk menentukan lokasi yang akurat.
+                    </small>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="kecamatan" class="form-label">Kecamatan <span class="text-danger">*</span></label>
+                    <select class="form-select" id="kecamatan" name="kecamatan" required>
+                        <option selected disabled value="">Pilih Kecamatan...</option>
+                        {% for kec in data_wilayah.keys()|sort %}
+                            <option value="{{ kec }}" {% if form_data and form_data.kecamatan == kec %}selected{% endif %}>{{ kec }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="kelurahan" class="form-label">Kelurahan <span class="text-danger">*</span></label>
+                    <select class="form-select" id="kelurahan" name="kelurahan" required>
+                        <option selected disabled value="">Pilih Kecamatan Dulu...</option>
+                    </select>
+                </div>
+
+                <input type="hidden" id="latitude" name="latitude" value="{{ form_data.latitude or '' }}" required>
+                <input type="hidden" id="longitude" name="longitude" value="{{ form_data.longitude or '' }}" required>
+            </div>
+
+            <div class="d-grid mt-5">
+                <button type="submit" class="btn btn-submit-elegant btn-lg">
+                    <i class="bi bi-send-fill me-2"></i> Kirim Laporan
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 
-<!-- Leaflet CSS and JS for Map -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 {% endblock %}
 
 {% block scripts %}
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    var map = L.map('map').setView([-5.42, 105.26], 12); // Center of Bandar Lampung
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
+    // ... (Script JavaScript tetap sama) ...
+    document.addEventListener('DOMContentLoaded', function () {
+        // Inisialisasi Peta
+        var map = L.map('map').setView([-5.42, 105.26], 12); // Center of Bandar Lampung
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
 
-    var marker = null;
-    var latInput = document.getElementById('latitude');
-    var lonInput = document.getElementById('longitude');
+        var marker = null;
+        var latInput = document.getElementById('latitude');
+        var lonInput = document.getElementById('longitude');
 
-    function placeMarker(lat, lon) {
-        if (marker) {
-            marker.setLatLng([lat, lon]);
-        } else {
-            marker = L.marker([lat, lon], { draggable: true }).addTo(map);
-            marker.on('dragend', function (event) {
-                var position = marker.getLatLng();
-                latInput.value = position.lat;
-                lonInput.value = position.lng;
-            });
-        }
-        latInput.value = lat;
-        lonInput.value = lon;
-        map.setView([lat, lon], 15);
-    }
-
-    if (latInput.value && lonInput.value) {
-        placeMarker(parseFloat(latInput.value), parseFloat(lonInput.value));
-    }
-
-    map.on('click', function (e) {
-        placeMarker(e.latlng.lat, e.latlng.lng);
-    });
-
-    var kecamatanSelect = document.getElementById('kecamatan');
-    var kelurahanSelect = document.getElementById('kelurahan');
-    var dataWilayah = {{ data_wilayah | tojson }};
-
-    kecamatanSelect.addEventListener('change', function () {
-        var selectedKecamatan = this.value;
-        var kelurahanOptions = dataWilayah[selectedKecamatan] ? dataWilayah[selectedKecamatan].kelurahan : [];
-
-        // --- KODE BARU UNTUK ZOOM PETA ---
-        if (dataWilayah[selectedKecamatan] && dataWilayah[selectedKecamatan].coords) {
-            var coords = dataWilayah[selectedKecamatan].coords;
-            map.setView(coords, 14); // Zoom ke koordinat kecamatan
-        }
-        // --- AKHIR KODE BARU ---
-
-        kelurahanSelect.innerHTML = '<option selected disabled value="">Pilih Kelurahan...</option>';
-
-        kelurahanOptions.forEach(function (kel) {
-            var option = document.createElement('option');
-            option.value = kel;
-            option.textContent = kel;
-            kelurahanSelect.appendChild(option);
-        });
-    });
-
-    if (kecamatanSelect.value) {
-        kecamatanSelect.dispatchEvent(new Event('change'));
-        setTimeout(function() {
-            var oldKelurahan = "{{ form_data.kelurahan or '' }}";
-            if (oldKelurahan) {
-                kelurahanSelect.value = oldKelurahan;
+        function placeMarker(lat, lon) {
+            if (marker) {
+                marker.setLatLng([lat, lon]);
+            } else {
+                marker = L.marker([lat, lon], { draggable: true }).addTo(map); 
+                marker.on('dragend', function (event) {
+                    var position = marker.getLatLng();
+                    latInput.value = position.lat;
+                    lonInput.value = position.lng;
+                });
             }
-        }, 100);
-    }
-});
+            latInput.value = lat;
+            lonInput.value = lon;
+            map.setView([lat, lon], 15);
+        }
+
+        if (latInput.value && lonInput.value) {
+            placeMarker(parseFloat(latInput.value), parseFloat(lonInput.value));
+        }
+
+        map.on('click', function (e) {
+            placeMarker(e.latlng.lat, e.latlng.lng);
+        });
+
+        // Dropdown Wilayah Dinamis
+        var kecamatanSelect = document.getElementById('kecamatan');
+        var kelurahanSelect = document.getElementById('kelurahan');
+        // Asumsi `data_wilayah` sudah ada dari backend
+        var dataWilayah = {{ data_wilayah | tojson }}; 
+
+        kecamatanSelect.addEventListener('change', function () {
+            var selectedKecamatan = this.value;
+            var kelurahanOptions = dataWilayah[selectedKecamatan] ? dataWilayah[selectedKecamatan].kelurahan : [];
+
+            // Zoom peta ke koordinat kecamatan yang dipilih
+            if (dataWilayah[selectedKecamatan] && dataWilayah[selectedKecamatan].coords) {
+                var coords = dataWilayah[selectedKecamatan].coords;
+                map.setView(coords, 14); 
+            }
+
+            kelurahanSelect.innerHTML = '<option selected disabled value="">Pilih Kelurahan...</option>';
+
+            kelurahanOptions.forEach(function (kel) {
+                var option = document.createElement('option');
+                option.value = kel;
+                option.textContent = kel;
+                kelurahanSelect.appendChild(option);
+            });
+        });
+
+        if (kecamatanSelect.value) {
+            kecamatanSelect.dispatchEvent(new Event('change'));
+            setTimeout(function() {
+                var oldKelurahan = "{{ form_data.kelurahan or '' }}";
+                if (oldKelurahan) {
+                    kelurahanSelect.value = oldKelurahan;
+                }
+            }, 150);
+        }
+    });
 </script>
 {% endblock %}

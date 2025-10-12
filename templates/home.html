@@ -1,60 +1,183 @@
 {% extends "layout.html" %} {% block title %}Dashboard Publik Lapor!{% endblock %} {% block content %}
-<div class="section" id="hero">
-     <div class="container py-5 text-center">
-          <h1 class="display-6 fw-bold text-white mb-3">Suara Anda, Perubahan Kota Kami</h1>
+<style>
+     /* SKEMA WARNA BIRU MUDA KONSISTEN */
+     :root {
+          --primary-light: #f0f8ff; /* Background Terang */
+          --secondary-blue: #1e88e5; /* Biru Cerah (Judul Section, Aksen) */
+          --accent-green: #00897b; /* Hijau Teal (Tombol) */
+          --dark-text: #343a40; /* Teks Utama Gelap */
+          --sub-text: #6c757d; /* Abu-abu untuk sub-teks */
+          --card-bg: #ffffff; /* Card Background Putih */
+     }
+
+     /* 1. Pengaturan Warna Latar Belakang Global (Menggunakan variabel layout) */
+     body {
+          background-color: var(--primary-light) !important;
+          color: var(--dark-text);
+     }
+
+     /* 2. Style untuk Section Hero */
+     #hero {
+          background-color: var(--secondary-blue); /* Biru Cerah sebagai latar hero */
+          min-height: 40vh;
+          padding-top: 5rem;
+          padding-bottom: 5rem;
+     }
+
+     /* 3. Style untuk Judul dan Teks di Hero */
+     #hero h1 {
+          color: var(--primary-light) !important; /* Judul Putih */
+          font-weight: 700 !important;
+          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+     }
+     #hero p.lead {
+          color: #e0e0e0 !important; /* Teks sedikit abu-abu terang */
+     }
+
+     /* 4. Style untuk Tombol Utama (Aksen Hijau Teal) */
+     .btn-lapor-accent {
+          background-color: var(--accent-green) !important;
+          border-color: var(--accent-green) !important;
+          color: #ffffff !important;
+          font-weight: bold !important;
+          transition: all 0.3s;
+          box-shadow: 0 5px 15px rgba(0, 137, 123, 0.3);
+     }
+     .btn-lapor-accent:hover {
+          background-color: #00a896 !important;
+          border-color: #00a896 !important;
+          box-shadow: 0 5px 20px rgba(0, 137, 123, 0.5);
+     }
+
+     /* 5. Style untuk Bagian Laporan dan Pengumuman */
+     .section {
+          padding-top: 3rem;
+          padding-bottom: 3rem;
+          background-color: var(--primary-light) !important;
+          color: var(--dark-text);
+     }
+     #laporanTerbaru h4,
+     #pengumuman h4,
+     #petaLaporan h4 {
+          color: var(--secondary-blue) !important; /* Judul section berwarna Biru Cerah */
+          border-bottom: 2px solid var(--secondary-blue);
+          display: inline-block;
+          padding-bottom: 5px;
+     }
+     /* Mengubah teks 'muted' agar terlihat baik di background terang */
+     .text-muted {
+          color: var(--sub-text) !important;
+     }
+
+     /* 6. Style untuk Card Laporan/Pengumuman (Disesuaikan untuk Light Mode) */
+     .card.laporan-card,
+     .card.pengumuman-card {
+          background-color: var(--card-bg);
+          color: var(--dark-text);
+          transition: transform 0.2s, box-shadow 0.2s;
+          border: 1px solid #dee2e6;
+          border-radius: 0.75rem;
+     }
+     .card.laporan-card:hover,
+     .card.pengumuman-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+     }
+     .card-title.text-dark {
+          color: var(--secondary-blue) !important;
+     }
+     .card-subtitle.text-muted {
+          color: var(--sub-text) !important;
+     }
+     .card-body a {
+          color: var(--secondary-blue);
+     }
+
+     /* 6.1: Placeholder "Tidak ada Foto" */
+     .card-img-top + .card-body .text-muted.small {
+          color: var(--sub-text) !important;
+     }
+     .card-img-top + .card-body {
+          background-color: var(--card-bg);
+     }
+     .card-img-top[style*="background-color: var(--primary-dark)"] {
+          background-color: #e9ecef !important; /* Ubah warna placeholder gelap menjadi abu terang */
+     }
+
+     /* 7. Style untuk MAP Section */
+     #map {
+          height: 500px;
+          border-radius: 0.5rem;
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+          margin-bottom: 2rem;
+          z-index: 1; /* Penting agar map tetap di atas elemen lain */
+     }
+     .map-filter {
+          background-color: var(--card-bg);
+          border: 1px solid #dee2e6;
+          padding: 0.5rem;
+          border-radius: 0.5rem;
+          margin-bottom: 1rem;
+          display: inline-flex;
+     }
+     .map-filter .form-check-label {
+          color: var(--dark-text);
+     }
+     .map-filter .form-check-input:checked + .form-check-label {
+          color: var(--secondary-blue);
+          font-weight: 600;
+     }
+     .text-truncate-3 {
+          display: -webkit-box;
+          -webkit-line-clamp: 3;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          text-overflow: ellipsis;
+     }
+</style>
+
+<div class="section d-flex justify-content-center" id="hero">
+     <div class="container text-center">
+          <h1 class="display-6 fw-bold">Suara Anda, Perubahan Kota Kami</h1>
           <p class="lead text-white-50">Platform resmi Lapor! Pemerintah Kota Bandar Lampung. Laporkan berbagai isu mulai dari infrastruktur, layanan publik, hingga lingkungan, dan pantau langsung perkembangannya.</p>
           <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mt-4">
-               <a href="{{ url_for('lapor') }}" class="btn btn-warning btn-lg px-4 gap-3 fw-bold laporan"> <i class="bi bi-chat-left-text-fill me-2"></i>Buat Laporan </a>
+               <a href="{{ url_for('lapor') }}" class="btn btn-submit-elegant btn-lg px-4 gap-3"> <i class="bi bi-chat-left-text-fill me-2"></i>Buat Laporan </a>
           </div>
      </div>
-
-     <svg id="wave" style="transform: rotate(0deg); transition: 0.3s" viewBox="0 0 1440 100" version="1.1" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-               <linearGradient id="sw-gradient-0" x1="0" x2="0" y1="1" y2="0">
-                    <stop stop-color="rgba(248, 249, 250, 1)" offset="0%"></stop>
-                    <stop stop-color="rgba(248, 249, 250, 1)" offset="100%"></stop>
-               </linearGradient>
-          </defs>
-          <path
-               style="transform: translate(0, 0px); opacity: 1"
-               fill="url(#sw-gradient-0)"
-               d="M0,40L30,35C60,30,120,20,180,16.7C240,13,300,17,360,26.7C420,37,480,53,540,50C600,47,660,23,720,25C780,27,840,53,900,65C960,77,1020,73,1080,68.3C1140,63,1200,57,1260,51.7C1320,47,1380,43,1440,41.7C1500,40,1560,40,1620,41.7C1680,43,1740,47,1800,43.3C1860,40,1920,30,1980,36.7C2040,43,2100,67,2160,71.7C2220,77,2280,63,2340,48.3C2400,33,2460,17,2520,16.7C2580,17,2640,33,2700,33.3C2760,33,2820,17,2880,23.3C2940,30,3000,60,3060,60C3120,60,3180,30,3240,23.3C3300,17,3360,33,3420,40C3480,47,3540,43,3600,46.7C3660,50,3720,60,3780,66.7C3840,73,3900,77,3960,73.3C4020,70,4080,60,4140,48.3C4200,37,4260,23,4290,16.7L4320,10L4320,100L4290,100C4260,100,4200,100,4140,100C4080,100,4020,100,3960,100C3900,100,3840,100,3780,100C3720,100,3660,100,3600,100C3540,100,3480,100,3420,100C3360,100,3300,100,3240,100C3180,100,3120,100,3060,100C3000,100,2940,100,2880,100C2820,100,2760,100,2700,100C2640,100,2580,100,2520,100C2460,100,2400,100,2340,100C2280,100,2220,100,2160,100C2100,100,2040,100,1980,100C1920,100,1860,100,1800,100C1740,100,1680,100,1620,100C1560,100,1500,100,1440,100C1380,100,1320,100,1260,100C1200,100,1140,100,1080,100C1020,100,960,100,900,100C840,100,780,100,720,100C660,100,600,100,540,100C480,100,420,100,360,100C300,100,240,100,180,100C120,100,60,100,30,100L0,100Z"
-          ></path>
-     </svg>
 </div>
 
-<!-- First Row  ------------------------------------------------------------------>
 <div class="section" id="laporanTerbaru">
      <div class="container-md text-center">
-          <div class="row p-4 justify-content-around align-items-center">
-               <div class="col-12 text-center mb-5">
-                    <h4 class="display-6 fw-bold text-black">Laporan Terbaru</h4>
+          <div class="row p-3 p-md-4 justify-content-around align-items-center">
+               <div class="col-12 text-center mb-4 mb-md-5">
+                    <div class="title-laporan mb-5"></div>
+                    <h4 class="display-6 fw-bold">Laporan Terbaru</h4>
                     <p class="text-muted">Lihat laporan terbaru yang sudah masuk, dilengkapi foto bukti.</p>
                </div>
 
                <div class="col-12">
                     <div id="laporanCarousel" class="carousel slide bg-transparent" data-bs-ride="carousel">
-                         <div class="carousel-inner p-3" role="listbox">
+                         <div class="carousel-inner p-1 p-md-3" role="listbox">
                               {% set chunk_size = 4 %} {% set chunks = (paginated_laporan_list | batch(chunk_size)) %} {% for chunk in chunks %}
                               <div class="carousel-item {% if loop.first %}active{% endif %}">
                                    <div class="row g-4">
                                         {% for laporan in chunk %}
-                                        <div class="col-lg-3 col-md-6">
+                                        <div class="col-12 col-sm-6 col-lg-3">
                                              <a href="{{ url_for('detail_laporan', laporan_id=laporan.id) }}" class="card laporan-card shadow-sm h-100 text-decoration-none transition-hover">
                                                   {% if laporan.foto %}
                                                   <img src="{{ url_for('static', filename='uploads/' + laporan.foto) }}" class="card-img-top object-fit-cover" alt="{{ laporan.judul }}" style="height: 180px" />
                                                   {% else %}
-                                                  <div class="card-img-top d-flex flex-column align-items-center justify-content-center text-muted p-4" style="height: 180px">
-                                                       <i class="bi bi-image-fill fs-3 mb-2"></i>
-                                                       <small>Tidak ada Foto</small>
+                                                  <div class="card-img-top d-flex flex-column align-items-center justify-content-center text-muted p-4" style="height: 180px; background-color: #e9ecef">
+                                                       <i class="bi bi-image-fill fs-3 mb-2" style="color: var(--sub-text)"></i>
+                                                       <small style="color: var(--sub-text)">Tidak ada Foto</small>
                                                   </div>
                                                   {% endif %}
                                                   <div class="card-body d-flex flex-column">
                                                        <h5 class="card-title fw-bold text-truncate text-dark">{{ laporan.judul }}</h5>
-                                                       <h6 class="card-subtitle mb-2 text-muted">Pelapor: {{ laporan.nama_pelapor }}</h6>
-                                                       <p class="card-text text-sm flex-grow-1 text-truncate-3" style="max-height: 4.5em; overflow: hidden">{{ laporan.deskripsi }}</p>
+                                                       <h6 class="card-subtitle mb-2 text-muted small">Pelapor: {{ laporan.nama_pelapor }}</h6>
+                                                       <p class="card-text text-sm flex-grow-1 text-muted text-truncate-3">{{ laporan.deskripsi }}</p>
 
-                                                       <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top">
+                                                       <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top" style="border-color: #dee2e6 !important">
                                                             <span
                                                                  class="badge {% if laporan.status == 'Diterima' %}bg-warning text-dark{% elif laporan.status == 'Diproses' %}bg-info text-dark{% elif laporan.status == 'Selesai' %}bg-success{% else %}bg-secondary{% endif %} rounded-pill fw-semibold"
                                                             >
@@ -91,39 +214,29 @@
      </div>
 </div>
 
-<!-- Seccond Row --------------------------------------------------------->
 <div class="section" id="pengumuman">
      <div class="container-md text-center">
-          <div class="row p-4 justify-content-around align-items-center">
-               <div class="col-12 text-center mb-5">
-                    <h4 class="display-6 fw-bold text-black">Pengumuman</h4>
+          <div class="row p-3 p-md-4 justify-content-around align-items-center">
+               <div class="col-12 text-center mb-4 mb-md-5">
+                    <h4 class="display-6 fw-bold">Pengumuman</h4>
                     <p class="text-muted">Berikut beberapa informasi yang dapat kami sampaikan</p>
                </div>
 
                <div class="col-12">
                     <div id="pengumumanCarousel" class="carousel slide" data-bs-ride="carousel">
-                         <div class="carousel-inner" role="listbox">
-                              {% set chunk_size = 4 %} {# Menggunakan paginated_pengumuman_list untuk data carousel #} {% set chunks = (paginated_pengumuman_list | batch(chunk_size)) %} {% for chunk in chunks %}
+                         <div class="carousel-inner p-1 p-md-3" role="listbox">
+                              {% set chunk_size = 4 %} {% set chunks = (paginated_pengumuman_list | batch(chunk_size)) %} {% for chunk in chunks %}
                               <div class="carousel-item {% if loop.first %}active{% endif %}">
                                    <div class="row g-4">
                                         {% for pengumuman in chunk %}
-                                        <div class="col-lg-3 col-md-6">
-                                             {# Link ke detail laporan (sesuaikan jika ada detail pengumuman terpisah) #}
-                                             <a href="{{ url_for('detail_laporan', laporan_id=pengumuman.id) }}" class="card pengumuman-card shadow-sm h-100">
+                                        <div class="col-12 col-sm-6 col-lg-3">
+                                             <a href="{{ url_for('detail_laporan', laporan_id=pengumuman.id) }}" class="card pengumuman-card shadow-sm h-100 text-decoration-none transition-hover">
                                                   <div class="card-body d-flex flex-column">
-                                                       <h5 class="card-title fw-bold text-truncate">Re: {{ pengumuman.judul }}</h5>
-                                                       {# Pengumuman mungkin tidak memiliki 'nama_pelapor', jadi bisa dihapus atau diganti #} {#
-                                                       <h6 class="card-subtitle mb-2 text-muted">Pelapor: N/A</h6>
-                                                       #}
-                                                       <p class="card-text flex-grow-1">{{ pengumuman.pengumuman_publik }}</p>
-                                                       <div class="d-flex justify-content-between align-items-center mt-auto pt-2">
-                                                            {# Pengumuman mungkin tidak memiliki 'status', jadi bisa dihapus #} {#
-                                                            <span
-                                                                 class="badge {% if pengumuman.status == 'Diterima' %}bg-warning text-dark{% elif pengumuman.status == 'Diproses' %}bg-info text-dark{% elif pengumuman.status == 'Selesai' %}bg-success{% else %}bg-secondary{% endif %} rounded-pill"
-                                                            >
-                                                                 {{ pengumuman.status }}
-                                                            </span>
-                                                            #}
+                                                       <h5 class="card-title fw-bold text-truncate text-dark">Re: {{ pengumuman.judul }}</h5>
+
+                                                       <p class="card-text flex-grow-1 text-muted text-truncate-3">{{ pengumuman.pengumuman_publik }}</p>
+
+                                                       <div class="d-flex justify-content-end align-items-center mt-auto pt-2 border-top" style="border-color: #dee2e6 !important">
                                                             <small class="text-muted"><i class="bi bi-calendar-check me-1"></i>{{ pengumuman.timestamp.split(' ')[0] }}</small>
                                                        </div>
                                                   </div>
@@ -132,7 +245,7 @@
                                         {% endfor %}
                                    </div>
                               </div>
-                              {% endfor %} {# Jika tidak ada pengumuman #} {% if not paginated_pengumuman_list %}
+                              {% endfor %} {% if not paginated_pengumuman_list %}
                               <div class="carousel-item active">
                                    <div class="d-flex align-items-center justify-content-center py-5">
                                         <p class="text-muted">Belum ada pengumuman.</p>
@@ -141,7 +254,6 @@
                               {% endif %}
                          </div>
 
-                         {# Navigasi Carousel #}
                          <button class="carousel-control-prev" type="button" data-bs-target="#pengumumanCarousel" data-bs-slide="prev">
                               <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                               <span class="visually-hidden">Previous</span>
@@ -158,63 +270,81 @@
 {% endblock %} {% block scripts %} {{ super() }}
 <script>
      document.addEventListener('DOMContentLoaded', function () {
-         var map = L.map('map').setView([-5.42, 105.26], 13);
-         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-             maxZoom: 19,
-             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-         }).addTo(map);
+         // Skema Warna untuk Marker Pop-up (Menyesuaikan dengan tema terang)
+         const ACCENT_COLOR = '#1e88e5'; // Biru Cerah
+         const DARK_BG_COLOR = '#343a40';
 
-         const allLaporanData = {{ all_laporan_list | tojson | safe }};
-         let markers = L.layerGroup().addTo(map);
+         // Inisialisasi map hanya jika elemen 'map' ada
+         if (document.getElementById('map')) {
+             var map = L.map('map').setView([-5.42, 105.26], 13); // Koordinat tengah Bandar Lampung
+             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                 maxZoom: 19,
+                 attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+             }).addTo(map);
 
-         // Definisi warna yang konsisten dengan badge status
-         const statusColors = {
-             'Diterima': '#ffc107', // Kuning
-             'Diproses': '#0d6efd', // Biru
-             'Selesai': '#198754'   // Hijau
-         };
+             // Variabel ini harus disediakan oleh Flask di rute Anda
+             const allLaporanData = {{ all_laporan_list | tojson | safe }};
+             let markers = L.layerGroup().addTo(map);
 
-         function createCustomIcon(status) {
-             const color = statusColors[status] || '#6c757d'; // Default color abu-abu
-             return L.divIcon({
-                 html: `<div style="width: 24px; height: 24px; background-color: ${color}; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.4); border: 2px solid white;"><i class="bi bi-geo-alt-fill" style="color: white; font-size: 12px;"></i></div>`,
-                 className: 'custom-map-icon',
-                 iconSize: [24, 24],
-                 iconAnchor: [12, 24],
-                 popupAnchor: [0, -24]
+             const statusColors = {
+                 'Diterima': '#ffc107', // Kuning/Warning
+                 'Diproses': '#1e88e5', // Biru Cerah
+                 'Selesai': '#00897b'   // Hijau Teal
+             };
+
+             function createCustomIcon(status) {
+                 const color = statusColors[status] || '#6c757d'; // Default Grey
+                 return L.divIcon({
+                     html: `<div style="width: 24px; height: 24px; background-color: ${color}; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.4); border: 2px solid white;"><i class="bi bi-geo-alt-fill" style="color: white; font-size: 12px;"></i></div>`,
+                     className: 'custom-map-icon',
+                     iconSize: [24, 24],
+                     iconAnchor: [12, 24],
+                     popupAnchor: [0, -24]
+                 });
+             }
+
+             function updateMap(filter) {
+                 markers.clearLayers();
+                 allLaporanData.forEach(function(laporan) {
+                     let show = false;
+                     if (filter === 'semua') {
+                         show = true;
+                     } else if (filter === 'selesai' && laporan.status === 'Selesai') {
+                         show = true;
+                     } else if (filter === 'berjalan' && (laporan.status === 'Diterima' || laporan.status === 'Diproses')) {
+                         show = true;
+                     }
+
+                     if (show && laporan.latitude && laporan.longitude) {
+                         var marker = L.marker([laporan.latitude, laporan.longitude], {
+                             icon: createCustomIcon(laporan.status)
+                         });
+                         marker.bindPopup(`<b>${laporan.judul}</b><br>Status: ${laporan.status}<br><a href="/laporan/${laporan.id}" style="color: ${ACCENT_COLOR};">Lihat Detail</a>`);
+                         markers.addLayer(marker);
+                     }
+                 });
+             }
+
+             document.querySelectorAll('input[name="map_filter"]').forEach(radio => {
+                 radio.addEventListener('change', function() {
+                     updateMap(this.value);
+                 });
              });
+
+             // Initial map load
+             updateMap('semua');
          }
 
-         function updateMap(filter) {
-             markers.clearLayers();
-             allLaporanData.forEach(function(laporan) {
-                 let show = false;
-                 if (filter === 'semua') {
-                     show = true;
-                 } else if (filter === 'selesai' && laporan.status === 'Selesai') {
-                     show = true;
-                 } else if (filter === 'berjalan' && (laporan.status === 'Diterima' || laporan.status === 'Diproses')) {
-                     show = true;
-                 }
-
-                 if (show && laporan.latitude && laporan.longitude) {
-                     var marker = L.marker([laporan.latitude, laporan.longitude], {
-                         icon: createCustomIcon(laporan.status)
-                     });
-                     marker.bindPopup(`<b>${laporan.judul}</b><br>Status: ${laporan.status}<br><a href="/laporan/${laporan.id}">Lihat Detail</a>`);
-                     markers.addLayer(marker);
-                 }
-             });
-         }
-
-         document.querySelectorAll('input[name="map_filter"]').forEach(radio => {
-             radio.addEventListener('change', function() {
-                 updateMap(this.value);
-             });
+         // Mengaktifkan fitur geser/swipe untuk carousel di perangkat mobile
+         const carousels = document.querySelectorAll('.carousel.slide');
+         carousels.forEach(carousel => {
+             if (window.innerWidth < 768) {
+                 new bootstrap.Carousel(carousel, {
+                     interval: false
+                 });
+             }
          });
 
-         // Initial map load
-         updateMap('semua');
      });
 </script>
 {% endblock %}
