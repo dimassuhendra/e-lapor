@@ -170,7 +170,11 @@ def login_required(f):
 
 # --- Rute Publik ---
 @app.route('/')
-def index():
+def index(): 
+    return render_template('welcome.html')
+
+@app.route('/home')
+def home():
     laporan_page = request.args.get('laporan_page', 1, type=int)
     laporan_per_page = 30
     laporan_offset = (laporan_page - 1) * laporan_per_page
