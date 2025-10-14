@@ -10,6 +10,9 @@ from math import radians, cos, sin, asin, sqrt
 import numpy as np
 from nltk.corpus import stopwords
 import re
+from twitter_scraper import get_tweets 
+from datetime import timedelta
+
 
 # Kamus sentimen sederhana untuk bahasa Indonesia
 positive_words = ["bagus", "baik", "aman", "bersih", "lancar", "indah", "cepat"]
@@ -199,6 +202,71 @@ def run_sentiment_wordcloud(df):
         "negatif": Counter(negatif_tokens).most_common(30),
     }
 
+
+# --- FUNGSI BARU: Analisis Tren Harian ---
+def run_daily_trends(df):
+    if df.empty:
+        # Jika DataFrame kosong, kembalikan 15 hari terakhir dari HARI INI
+        max_date = pd.to_datetime('today').normalize()
+    else:
+        # Pastikan 'timestamp' adalah datetime, jika belum
+        df['timestamp'] = pd.to_datetime(df['timestamp'])
+        
+        # Ekstrak tanggal saja
+        df['date'] = df['timestamp'].dt.normalize()
+        
+        # Tentukan tanggal laporan terakhir yang masuk (max_date)
+        max_date = df['date'].max()
+
+    # =========================================================================
+    # LOGIKA PEMBATASAN RENTANG 15 HARI
+    # =========================================================================
+    
+    # Tanggal awal adalah 14 hari sebelum tanggal maksimum (sehingga total 15 hari)
+    min_date = max_date - timedelta(days=14)
+    
+    # Buat rentang tanggal lengkap 15 hari
+    date_range = pd.date_range(start=min_date, end=max_date, freq='D')
+    
+    # =========================================================================
+    # PENGHITUNGAN DATA
+    # =========================================================================
+    
+    if not df.empty:
+        # Hitung jumlah laporan per tanggal
+        daily_counts = df.groupby('date').size()
+    else:
+        # Jika df kosong, daily_counts juga kosong
+        daily_counts = pd.Series(dtype=int) 
+    
+    # Gabungkan (reindex) dengan rentang tanggal lengkap 15 hari, 
+    # isi nilai yang hilang (tidak ada laporan) dengan 0
+    daily_trend_df = daily_counts.reindex(date_range, fill_value=0)
+    
+    # =========================================================================
+    # FORMAT OUTPUT CHART.JS
+    # =========================================================================
+    
+    # Format hasil untuk chart.js
+    labels = daily_trend_df.index.strftime('%Y-%m-%d').tolist()
+    data = daily_trend_df.tolist()
+    
+    return {
+        "labels": labels,
+        "datasets": [
+            {
+                "label": "Jumlah Laporan Masuk",
+                "data": data,
+                "borderColor": "#0d6efd", 
+                "tension": 0.4,
+                "fill": False,
+                # Pastikan type adalah 'line' jika fungsi JS tidak menyetelnya
+                "type": 'line' 
+            }
+        ]
+    }
+# --- AKHIR FUNGSI BARU ---
+
 # Fungsi utama untuk menjalankan analisis keseluruhan data laporan
 def run_full_analysis(start_date=None, end_date=None):
     # Daftar warna untuk visualisasi per kategori
@@ -227,9 +295,10 @@ def run_full_analysis(start_date=None, end_date=None):
             "stats_by_status": {}, 
             "stats_by_kecamatan": {}, 
             "monthly_trends": {},
+            "daily_trends": run_daily_trends(df.copy()),
             "text_analysis": {}, 
             "geospatial_analysis": {},
-            "start_date": start_date, 
+            "start_date": start_date,   
             "end_date": end_date
         }
 
@@ -264,6 +333,7 @@ def run_full_analysis(start_date=None, end_date=None):
             "backgroundColor": color_map.get(category, 'grey')
         })
 
+    daily_trends_results = run_daily_trends(df.copy()) 
     monthly_trends = {"labels": all_months, "datasets": trend_datasets}
     text_results = run_text_analysis(df.copy())
     geospatial_results = run_geospatial_analysis(df.copy())
@@ -276,9 +346,241 @@ def run_full_analysis(start_date=None, end_date=None):
         "stats_by_status": stats_by_status,
         "stats_by_kecamatan": stats_by_kecamatan,
         "monthly_trends": monthly_trends,
+        "daily_trends": daily_trends_results, # <-- FIX: Variabel kini terdefinisi
         "text_analysis": text_results,
         "geospatial_analysis": geospatial_results,
         "sentiment_wordcloud": sentiment_wordcloud,
         "start_date": start_date,
         "end_date": end_date
+    }
+
+# Tambahkan fungsi ini ke dalam ml_processor.py, di bagian bawah file
+
+def generate_summary_and_recommendations(analysis_results):
+    """
+    Menghasilkan ringkasan naratif, kesimpulan, dan rekomendasi untuk pemangku kebijakan 
+    berdasarkan hasil analisis data laporan keseluruhan.
+
+    Args:
+        analysis_results (dict): Hasil lengkap dari run_full_analysis().
+
+    Returns:
+        dict: Berisi 'summary_points' (list kalimat) dan 'recommendations' (list saran).
+    """
+    
+    total_laporan = analysis_results.get('total_laporan', 0)
+    summary_points = []
+    recommendations = []
+    
+    if total_laporan == 0:
+        return {
+            "summary_points": ["Tidak ada data laporan yang tersedia dalam periode ini."],
+            "recommendations": ["Lakukan sosialisasi masif agar masyarakat mulai menggunakan platform pelaporan."]
+        }
+
+    # --- Bagian 1: Ringkasan Umum & Tren Waktu ---
+    
+    # Tren Harian
+    daily_data = analysis_results.get('daily_trends', {}).get('datasets', [{}])[0].get('data', [])
+    if daily_data:
+        max_reports_day = max(daily_data)
+        min_reports_day = min(daily_data)
+        avg_reports_day = sum(daily_data) / len(daily_data) if daily_data else 0
+        
+        summary_points.append(f"Tercatat {total_laporan} laporan masuk dalam periode analisis ini.")
+        summary_points.append(f"Rata-rata laporan harian berada pada {avg_reports_day:.1f} laporan/hari, dengan puncak laporan harian mencapai {max_reports_day} laporan.")
+
+    # Tren Bulanan (Kategori)
+    monthly_trends = analysis_results.get('monthly_trends', {}).get('datasets', [])
+    if monthly_trends:
+        monthly_df = pd.DataFrame({d['label']: d['data'] for d in monthly_trends}, index=analysis_results['monthly_trends']['labels'])
+        top_category_overall = monthly_df.sum().idxmax()
+        
+        summary_points.append(f"Secara keseluruhan, {top_category_overall} merupakan kategori yang paling dominan dilaporkan.")
+        
+        # Cek kategori mana yang menunjukkan lonjakan (increase) signifikan
+        recent_month_data = monthly_df.iloc[-1].sort_values(ascending=False)
+        top_recent_category = recent_month_data.index[0]
+        
+        if top_recent_category != top_category_overall:
+             summary_points.append(f"Perlu diperhatikan, kategori {top_recent_category} menunjukkan lonjakan signifikan di bulan terakhir, meskipun bukan yang paling dominan secara keseluruhan.")
+
+
+    # --- Bagian 2: Fokus Masalah (Kategori & Geospasial) ---
+
+    stats_cat = analysis_results.get('stats_by_category', [])
+    if stats_cat:
+        # Kategori paling banyak dilaporkan (Top 3)
+        top_cats = sorted(stats_cat, key=lambda x: x['jumlah'], reverse=True)[:3]
+        top_cat_names = [c['kategori'] for c in top_cats if c['jumlah'] > 0]
+        if top_cat_names:
+            summary_points.append(f"Tiga isu utama yang mendominasi pelaporan adalah: {', '.join(top_cat_names)}.")
+
+    stats_kec = analysis_results.get('stats_by_kecamatan', {})
+    if stats_kec:
+        # Kecamatan paling banyak dilaporkan
+        top_kec = max(stats_kec, key=stats_kec.get)
+        summary_points.append(f"Secara geografis, wilayah {top_kec} memiliki jumlah laporan terbanyak, mengindikasikan perluasan fokus sumber daya di area tersebut.")
+
+
+    # --- Bagian 3: Sentimen & Urgensi Tindakan ---
+    
+    # Sentimen
+    sentiment_data = analysis_results.get('sentiment_wordcloud', {})
+    neg_count = sum(c[1] for c in sentiment_data.get('negatif', []))
+    pos_count = sum(c[1] for c in sentiment_data.get('positif', []))
+    
+    if neg_count > pos_count * 1.5:
+        summary_points.append(f"Mayoritas narasi laporan didominasi oleh sentimen negatif, dengan kata kunci sering muncul seperti: {', '.join([c[0] for c in sentiment_data.get('negatif', [])[:5]])}. Ini menuntut respons yang cepat dan empatik dari dinas terkait.")
+    elif pos_count > neg_count * 1.5:
+        summary_points.append("Sentimen yang muncul didominasi oleh kata-kata positif, yang menunjukkan apresiasi terhadap layanan yang sudah berjalan baik.")
+    else:
+        summary_points.append("Sentimen cenderung netral, namun terdapat beberapa kata kunci negatif yang perlu diwaspadai.")
+
+
+    # --- Bagian 4: Rekomendasi (Actionable Insights) ---
+    
+    # Rekomendasi 1: Fokus Kategori Utama
+    if top_cat_names:
+        recommendations.append(f"Segera alokasikan tim dan anggaran khusus untuk menangani {', '.join(top_cat_names)} di {top_kec} sebagai prioritas utama.")
+        
+    # Rekomendasi 2: Duplikasi & Efisiensi
+    recommendations.append("Manfaatkan fitur deteksi duplikasi untuk mengelompokkan laporan yang sama di lokasi berdekatan agar penanganan lebih efisien dan terintegrasi dalam satu penugasan.")
+    
+    # Rekomendasi 3: Respon Cepat (Sentimen)
+    recommendations.append("Tingkatkan kecepatan tanggapan dan komunikasi publik (melalui fitur pengumuman) untuk meredakan sentimen negatif, terutama pada laporan yang menggunakan kata kunci sensitif.")
+
+    return {
+        "summary_points": summary_points,
+        "recommendations": recommendations
+    }
+
+
+# Kamus kata kunci untuk Bandar Lampung
+BANDAR_LAMPUNG_KEYWORDS = [
+    # General & Location
+    "Bandar Lampung", 
+    "Balam", 
+    "Lampung", # Lebih luas, tapi relevan
+    "Bunda Eva",
+    "Jakarta",
+    "Klok",
+    "STY",
+    
+    # Keluhan Infrastruktur
+    "Jalan Rusak Lampung", 
+    "Jalan Berlubang Balam",
+    "Macet Balam",
+    "Lampu Merah Balam",
+    "Drainase Balam",
+    "Banjir Bandar Lampung",
+    
+    # Pelayanan Publik
+    "Pelayanan Balam Buruk", # Menargetkan sentimen negatif
+    "Pemkot Balam", 
+    "Polisi Lampung",
+    "RSUD Balam", # Rumah sakit
+    "PDAM Way Rilau",
+    "Parkir Liar",
+    
+    # Isu Sosial & Kebersihan
+    "Sampah Balam",
+    "Begall Lampung", # Isu keamanan
+    "Kriminal Balam",
+    
+    # Area Spesifik (Jika diperlukan, bisa ditambahkan lebih banyak)
+    "Tanjungkarang", 
+    "Kedaton",
+    "Antasari",
+    "Sukarame",
+    "UIN"
+]
+
+def build_query(keywords):
+    """Membangun string query pencarian untuk twitter-scraper."""
+    # Menambahkan filter umum: minimal 10 like (menunjukkan keterlibatan) dan hanya bahasa Indonesia
+    query = " OR ".join(keywords)
+    # CATATAN: Pustaka twitter-scraper tidak selalu mendukung syntax filter canggih (seperti min_retweets), 
+    # namun kita tetap mencoba menggunakan query yang jelas.
+    # Kita akan menggunakan syntax pencarian teks biasa.
+    return query
+
+def scrape_x_data(query_keywords=BANDAR_LAMPUNG_KEYWORDS, max_tweets=500):
+    """
+    Mengambil data dari X/Twitter menggunakan twitter-scraper dengan penanganan error.
+    """
+    search_query = build_query(query_keywords)
+    tweets_list = []
+    num_pages = int(max_tweets / 15) + 5
+    
+    # Menambahkan penanganan error spesifik untuk JSON
+    import json # Tambahkan import json di file ml_processor.py jika belum ada
+    
+    try:
+        # Menggunakan get_tweets() dari twitter_scraper
+        for i, tweet in enumerate(get_tweets(search_query, pages=num_pages)):
+            if i >= max_tweets:
+                break
+            
+            # Pastikan kunci 'text' dan 'time' ada
+            if 'text' in tweet and 'time' in tweet:
+                tweets_list.append({
+                    'id': tweet.get('tweetId'),
+                    'text': tweet['text'],
+                    'timestamp': tweet['time']
+                })
+        
+        df = pd.DataFrame(tweets_list)
+        
+        if not df.empty:
+             df['timestamp'] = pd.to_datetime(df['timestamp'], utc=True).dt.tz_convert('Asia/Jakarta').dt.tz_localize(None)
+        
+        return df
+        
+    # Tangkap error JSON (yang menyebabkan "Expecting value") dan error scraping lainnya
+    except json.JSONDecodeError as e:
+        print(f"Error JSON Decode (Blokir/Rate Limit?): {e}")
+        return pd.DataFrame()
+    except Exception as e:
+        print(f"Error umum saat scraping X/Twitter: {e}")
+        return pd.DataFrame()
+
+# Fungsi run_x_analysis (lanjutan dari ml_processor.py)
+def run_x_analysis(query_keywords=BANDAR_LAMPUNG_KEYWORDS, max_tweets=300):
+    """Mengambil dan menganalisis data X/Twitter."""
+    
+    # Ambil data dari X/Twitter
+    df_x = scrape_x_data(query_keywords, max_tweets)
+    
+    if df_x.empty:
+        return {"total_tweets": 0, "sentiment_summary": {}, "top_issues": [], "raw_data": []}
+
+    # --- Prapemrosesan & Analisis Sentimen ---
+    
+    # 1. Analisis Sentimen menggunakan get_sentiment
+    df_x['sentimen'] = df_x['text'].apply(get_sentiment)
+    sentiment_counts = df_x['sentimen'].value_counts().to_dict()
+    
+    # 2. Pembersihan teks
+    df_x['clean_text'] = df_x['text'].apply(preprocess_text)
+    
+    # 3. Analisis Topik (TF-IDF)
+    corpus = " ".join(df_x['clean_text'])
+    
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    try:
+        vectorizer = TfidfVectorizer(max_features=10, ngram_range=(1, 2)) # Gunakan bigram juga
+        vectorizer.fit_transform([corpus])
+        top_issues = vectorizer.get_feature_names_out().tolist()
+    except ValueError:
+        top_issues = []
+    
+    # Teks untuk ditampilkan
+    display_data = df_x[['text', 'timestamp', 'sentimen']].head(5).to_dict('records')
+
+    return {
+        "total_tweets": len(df_x),
+        "sentiment_summary": sentiment_counts,
+        "top_issues": top_issues,
+        "raw_data": display_data
     }

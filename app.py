@@ -322,6 +322,29 @@ def logout():
     flash('Anda telah berhasil logout.', 'info')
     return redirect(url_for('login'))
 
+# =================================================================
+# FUNGSI PEMBANTU UNTUK ANALISIS (Ditempatkan SEBELUM ROUTE yang menggunakannya)
+# =================================================================
+
+def get_report_status_stats(conn):
+    """Mengambil data jumlah laporan berdasarkan status (Diterima, Diproses, Selesai)."""
+    # Pastikan koneksi yang masuk adalah object database connection (conn)
+    stats = conn.execute("""
+        SELECT 
+            SUM(CASE WHEN status = 'Diterima' THEN 1 ELSE 0 END) AS diterima,
+            SUM(CASE WHEN status = 'Diproses' THEN 1 ELSE 0 END) AS diproses,
+            SUM(CASE WHEN status = 'Selesai' THEN 1 ELSE 0 END) AS selesai
+        FROM laporan
+    """).fetchone()
+    
+    # Pastikan mengembalikan 0 jika data tidak ada (None)
+    # Catatan: Jika Anda menggunakan sqlite3.Row, Anda bisa mengaksesnya seperti dictionary
+    return {
+        'diterima': stats['diterima'] if stats and stats['diterima'] is not None else 0,
+        'diproses': stats['diproses'] if stats and stats['diproses'] is not None else 0,
+        'selesai': stats['selesai'] if stats and stats['selesai'] is not None else 0
+    }
+
 @app.route('/admin/dashboard')
 @login_required
 def admin_dashboard():
@@ -501,13 +524,41 @@ def abaikan_duplikat(id1, id2):
 @app.route('/admin/analisis')
 @login_required
 def analisis():
+    # Catatan: Walaupun analisis laporan menggunakan DB, kita tidak perlu
+    # membuka dan menutup koneksi secara manual di sini, karena fungsi
+    # load_data_from_db() di ml_processor sudah menangani koneksi/diskoneksi DB.
+    # Kita hanya akan menghapus conn.close() di akhir agar kode lebih bersih.
+    # conn = get_db_connection() # Baris ini tidak diperlukan karena load_data_from_db menanganinya
+    
     start_date = request.args.get('start_date')
     end_date = request.args.get('end_date')
+
+    # 1. Jalankan Analisis Data Laporan dari Database
     results = ml_processor.run_full_analysis(start_date=start_date, end_date=end_date)
+    daily_trends = results.get('daily_trends', {"labels": [], "datasets": []})
+
+    # 2. Jalankan Analisis Data X/Twitter (Scraping)
+    # Anda bisa menyesuaikan batas (misalnya 300 tweet) di sini.
+    try:
+        x_analysis_results = ml_processor.run_x_analysis(max_tweets=300)
+    except Exception as e:
+        print(f"Error saat menjalankan analisis X/Twitter: {e}")
+        # Kembalikan hasil kosong jika scraping gagal
+        x_analysis_results = ml_processor.run_x_analysis(max_tweets=0)
+
+    # 3. Jalankan Fungsi Summary Naratif
+    summary_data = ml_processor.generate_summary_and_recommendations(results)
+    
+    # conn.close() # Baris ini dihapus karena tidak ada koneksi yang dibuka secara manual di sini.
+    
     return render_template(
         "admin/analisis.html",
-        results=results,
-        filters={'start_date': start_date, 'end_date': end_date}
+        results=results, 
+        daily_trends=daily_trends,
+        summary_data=summary_data, 
+        filters={'start_date': start_date, 'end_date': end_date},
+        # --- DATA BARU: Hasil Analisis X/Twitter ---
+        x_analysis_results=x_analysis_results 
     )
 
 @app.route('/admin/pusat_laporan', methods=['GET'])
