@@ -2,8 +2,22 @@
 {% block title %}Buat Laporan Baru Split Screen{% endblock %}
 
 {% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"> 
+
 <style>
-    /* --- STYLING UTAMA (Tetap) --- */
+    /* Variabel Root yang Sesuai dengan Tema Anda (jika belum ada di layout.html) */
+    :root {
+        --secondary-blue: #1e88e5; /* Biru Cerah - untuk fokus */
+        --accent-green: #00897b; /* Hijau Teal - untuk tombol utama */
+        --dark-text: #343a40; 
+        --sub-text: #6c757d; 
+        
+        /* Warna yang Sudah Anda Gunakan di Form Lapor */
+        --lapor-primary: #8be9fd; /* Biru Muda Neon */
+        --lapor-dark: #172a3a;
+    }
+
+    /* --- STYLING UTAMA (Dipertahankan) --- */
     body {
         background-color: #0b1a2b;
     }
@@ -16,7 +30,7 @@
         padding: 40px 0;
         display: flex;
         flex-direction: column;
-        box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+        /* Hapus box-shadow di sini jika split-form-container sudah punya */
     }
     .split-form-container {
         max-width: 1200px;
@@ -24,12 +38,15 @@
         border-radius: 1.5rem;
         overflow: hidden; 
         box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
-        /* Penting: Set lebar untuk tampilan desktop/tablet besar */
         width: 90%; 
+        display: grid; /* Gunakan grid untuk split screen */
+        grid-template-columns: 1fr 1.5fr; /* Panel kiri lebih kecil, form kanan lebih lebar */
+        background-color: white; /* Atur background di sini agar kontainer memiliki warna dasar */
     }
+    
     /* Bagian Copywriting (Kiri) - Dipertahankan */
     .copywriting-panel {
-        background-color: #172a3a;
+        background-color: var(--lapor-dark);
         color: #ffffff;
         padding: 5rem 3rem;
         display: flex;
@@ -39,219 +56,266 @@
         text-align: center;
     }
     .copywriting-panel h2 {
-        color: #8be9fd;
+        color: var(--lapor-primary);
         font-weight: 700;
         margin-bottom: 1rem;
     }
-    .copywriting-panel p {
-        color: #a0aec0;
-        font-size: 0.95rem;
-    }
     .copywriting-icon {
         font-size: 5rem;
-        color: #8be9fd;
+        color: var(--lapor-primary);
         margin-bottom: 2rem;
     }
+
     /* Bagian Form (Kanan) - Dipertahankan */
     .form-panel {
         background-color: #ffffff; 
         padding: 4rem;
     }
-    .form-panel .form-title { /* Menggunakan class asli Anda */
-        color: #172a3a;
+    .form-panel .form-title { 
+        color: var(--lapor-dark);
         font-weight: 600;
-        border-bottom: 2px solid #8be9fd;
+        border-bottom: 2px solid var(--lapor-primary);
         display: inline-block;
         padding-bottom: 5px;
         margin-bottom: 2rem;
     }
-    .form-control, .form-select {
-        border-radius: 0.5rem;
-        border-color: #e2e8f0;
+    
+    /* === REFACTORING INPUT FIELD (Gaya Login) === */
+    .input-group-field {
+        position: relative;
+        /* Jarak input antar field dihilangkan dari mb-3/mb-4 */
     }
-    .form-control:focus, .form-select:focus {
-        border-color: #8be9fd;
-        box-shadow: 0 0 0 0.25rem rgba(139, 233, 253, 0.4);
+
+    .input-group-field .form-control, 
+    .input-group-field .form-select,
+    .input-group-field .form-control:focus, 
+    .input-group-field .form-select:focus {
+        background: none;
+        border: none;
+        border-bottom: 2px solid var(--sub-text); 
+        border-radius: 0;
+        color: var(--dark-text);
+        padding-left: 35px; /* Jarak untuk ikon */
+        font-weight: 500;
+        box-shadow: none !important;
+        transition: border-color 0.3s;
     }
-    .btn-submit-elegant {
-        background-color: #8be9fd; 
-        border-color: #8be9fd;
-        color: #172a3a;
-        font-weight: bold;
-        transition: all 0.3s;
+
+    .input-group-field .form-control:focus, 
+    .input-group-field .form-select:focus {
+        border-bottom-color: var(--lapor-primary); /* Fokus border warna biru neon */
     }
-    .btn-submit-elegant:hover {
-        background-color: #a3f4ff;
-        border-color: #a3f4ff;
-        color: #172a3a;
+
+    .input-group-field .icon {
+        position: absolute;
+        left: 0;
+        top: 38px; /* Disesuaikan untuk turun di bawah label */
+        transform: translateY(-50%);
+        color: var(--lapor-primary); /* Warna ikon biru neon */
+        font-size: 1.2rem;
+        pointer-events: none;
+        z-index: 5; 
     }
+    
+    /* Penyesuaian ikon untuk textarea (top: 15px) */
+    .input-group-field textarea + .icon {
+        top: 50px; /* Ikon ditaruh di atas area teks */
+        transform: none;
+        font-size: 1.1rem;
+    }
+
+    /* Penyesuaian untuk file input */
+    .input-group-field input[type="file"] {
+        padding-left: 10px; /* Hapus padding ikon untuk input file */
+        border: 1px solid #e2e8f0; /* Beri border normal untuk input file */
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    /* Peta */
     #map {
         height: 300px !important;
         border-radius: 0.5rem !important;
         border: 1px solid #e2e8f0; 
     }
 
+    .btn-submit-elegant {
+        background-color: var(--accent-green); /* Gunakan warna tombol submit dari admin */
+        border-color: var(--accent-green);
+        color: white;
+        font-weight: bold;
+    }
+    .btn-submit-elegant:hover {
+        background-color: #00695c;
+        border-color: #00695c;
+    }
+
+
     /* --- REFACTORING MEDIA QUERIES UNTUK RESPONSIVITAS --- */
-    
-    /* Pada perangkat tablet (lebar < 992px) */
     @media (max-width: 991.98px) {
-        .form-center-container {
-            /* Hapus align-items: center; agar konten form mengisi atas ke bawah */
-            align-items: flex-start;
-            padding: 20px 0; /* Kurangi padding vertikal */
-        }
         .split-form-container {
-            /* Hapus max-width untuk mengisi layar */
-            max-width: none;
-            width: 100%; /* Mengisi lebar penuh */
-            border-radius: 0; /* Hapus border-radius */
-            box-shadow: none; /* Hapus bayangan */
+            grid-template-columns: 1fr; /* Tumpuk di layar kecil */
         }
         .copywriting-panel {
-            padding: 3rem 2rem; /* Kurangi padding di tablet */
+            padding: 3rem 2rem; 
         }
         .form-panel {
-             padding: 3rem 1.5rem; /* Kurangi padding di tablet */
+            padding: 3rem 1.5rem; 
         }
     }
 
-    /* Pada perangkat HP (lebar < 768px) */
     @media (max-width: 767.98px) {
-        /* Form dan Copywriting akan ditumpuk secara otomatis karena menggunakan col-md-6 */
-        
-        /* Mengatur .form-center-container di HP */
         .form-center-container {
-            padding: 0; /* Hapus padding agar form menempel ke tepi atas/bawah */
+            padding: 0; 
         }
-        .form-title {
-            text-align: center;
+        .split-form-container {
             width: 100%;
-            margin-top: 2rem;
+            border-radius: 0; 
+            box-shadow: none; 
         }
-        
-        /* Menyembunyikan Copywriting panel di HP untuk pengalaman yang lebih ringkas */
         .copywriting-panel {
             display: none !important; 
         }
-
         .form-panel {
-            padding: 2rem 1rem; /* Padding lebih kecil di HP */
-        }
-        
-        /* Memastikan Judul Form (yang sekarang berada di luar panel) tetap terlihat menonjol di HP */
-        .split-form-container > .form-title {
-            padding: 1.5rem 1rem 0 1rem; /* Tambahkan padding agar tidak menempel tepi */
-            display: block; /* Menjadikannya block agar menempati satu baris penuh */
-            font-size: 1.5rem;
-        }
-        .form-panel {
-            /* Menyesuaikan margin form-title di dalam form-panel jika Anda memutuskan memindahkannya di masa depan */
-            padding-top: 1rem;
+            padding: 2rem 1rem; 
         }
     }
 </style>
 
 <div class="form-center-container">
-        
-    <h3 class="form-title text-center">
-        <i class="bi bi-megaphone me-2"></i> Buat Laporan Baru
-    </h3>
-    
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <div class="mb-4">
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <div class="split-form-container">
+        <div class="copywriting-panel d-none d-lg-flex">
+            <div>
+                <i class="copywriting-icon fas fa-bullhorn"></i>
+                <h2>Suarakan Keluhan Anda</h2>
+                <p>Laporkan masalah di sekitar Anda dengan cepat dan mudah. Setiap laporan yang Anda berikan sangat berharga bagi peningkatan layanan publik.</p>
+                <div class="mt-4 pt-3 border-top border-secondary">
+                     <p class="small text-white-50 mb-0">Layanan Aspirasi dan Pengaduan Online Rakyat Kota Bandar Lampung</p>
                 </div>
-            {% endfor %}
             </div>
-        {% endif %}
-    {% endwith %}
+        </div>
 
-    <div class="col-md-9 form-panel bg-transparent d-flex align-items-center">
-        
-        <form method="POST" enctype="multipart/form-data" id="laporForm">
-            <div class="row g-4">
-                
-                <div class="col-md-6">
-                    <label for="nama_pelapor" class="form-label">Nama Pelapor <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" id="nama_pelapor" name="nama_pelapor" value="{{ form_data.nama_pelapor or '' }}" required>
-                </div>
-                <div class="col-md-6">
-                    <label for="no_whatsapp" class="form-label">No. WhatsApp (Opsional)</label>
-                    <input type="tel" class="form-control" id="no_whatsapp" name="no_whatsapp" value="{{ form_data.no_whatsapp or '' }}" placeholder="Contoh: 0812xxxxxx">
+        <div class="form-panel">
+            <h3 class="form-title">
+                <i class="fas fa-edit me-2"></i> Buat Laporan Baru
+            </h3>
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="mb-4">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" enctype="multipart/form-data" id="laporForm">
+                <div class="row g-4">
+                    
+                    <div class="col-md-6">
+                        <div class="input-group-field">
+                            <i class="icon fas fa-user"></i>
+                            <label for="nama_pelapor" class="form-label">Nama Pelapor <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="nama_pelapor" name="nama_pelapor" value="{{ form_data.nama_pelapor or '' }}" required placeholder="Masukkan Nama Lengkap">
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="input-group-field">
+                            <i class="icon fas fa-whatsapp"></i>
+                            <label for="no_whatsapp" class="form-label">No. WhatsApp (Opsional)</label>
+                            <input type="tel" class="form-control" id="no_whatsapp" name="no_whatsapp" value="{{ form_data.no_whatsapp or '' }}" placeholder="Contoh: 62812xxxxxx">
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="input-group-field">
+                            <i class="icon fas fa-comment-dots"></i>
+                            <label for="judul" class="form-label">Judul Laporan <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="judul" name="judul" value="{{ form_data.judul or '' }}" required placeholder="Contoh: Lampu Jalan Mati di Jl. Sudirman">
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="input-group-field">
+                            <i class="icon fas fa-file-alt"></i>
+                            <label for="deskripsi" class="form-label">Deskripsi Lengkap <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3" required placeholder="Jelaskan detail laporan Anda secara rinci.">{{ form_data.deskripsi or '' }}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="input-group-field">
+                            <i class="icon fas fa-tags"></i>
+                            <label for="kategori" class="form-label">Kategori Laporan <span class="text-danger">*</span></label>
+                            <select class="form-select" id="kategori" name="kategori_id" required>
+                                <option selected disabled value="">Pilih Kategori...</option>
+                                {% for kategori in kategori_list %}
+                                    <option value="{{ kategori.id }}" {% if form_data and form_data.kategori_id == kategori.id|string %}selected{% endif %}>
+                                        {{ kategori.nama_kategori }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="input-group-field">
+                            <label for="foto" class="form-label">Unggah Foto (Opsional)</label>
+                            <input class="form-control" type="file" id="foto" name="foto" accept="image/png, image/jpeg, image/jpg">
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label mt-3">Lokasi Laporan <span class="text-danger">*</span></label>
+                        <div id="map" class="mb-2"></div>
+                        <small class="form-text text-muted">
+                            <i class="fas fa-info-circle me-1"></i> Klik pada peta atau geser pin untuk menentukan lokasi yang akurat.
+                        </small>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="input-group-field">
+                            <i class="icon fas fa-map-marker-alt"></i>
+                            <label for="kecamatan" class="form-label">Kecamatan <span class="text-danger">*</span></label>
+                            <select class="form-select" id="kecamatan" name="kecamatan" required>
+                                <option selected disabled value="">Pilih Kecamatan...</option>
+                                {% for kec in data_wilayah.keys()|sort %}
+                                    <option value="{{ kec }}" {% if form_data and form_data.kecamatan == kec %}selected{% endif %}>{{ kec }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="input-group-field">
+                            <i class="icon fas fa-map-pin"></i>
+                            <label for="kelurahan" class="form-label">Kelurahan <span class="text-danger">*</span></label>
+                            <select class="form-select" id="kelurahan" name="kelurahan" required>
+                                <option selected disabled value="">Pilih Kecamatan Dulu...</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <input type="hidden" id="latitude" name="latitude" value="{{ form_data.latitude or '' }}" required>
+                    <input type="hidden" id="longitude" name="longitude" value="{{ form_data.longitude or '' }}" required>
                 </div>
 
-                <div class="col-12">
-                    <label for="judul" class="form-label">Judul Laporan <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" id="judul" name="judul" value="{{ form_data.judul or '' }}" required>
+                <div class="d-grid mt-5">
+                    <button type="submit" class="btn btn-submit-elegant btn-lg">
+                        <i class="fas fa-paper-plane me-2"></i> Kirim Laporan
+                    </button>
                 </div>
-
-                <div class="col-12">
-                    <label for="deskripsi" class="form-label">Deskripsi Lengkap <span class="text-danger">*</span></label>
-                    <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3" required>{{ form_data.deskripsi or '' }}</textarea>
-                </div>
-
-                <div class="col-md-6">
-                    <label for="kategori" class="form-label">Kategori Laporan <span class="text-danger">*</span></label>
-                    <select class="form-select" id="kategori" name="kategori_id" required>
-                        <option selected disabled value="">Pilih Kategori...</option>
-                        {% for kategori in kategori_list %}
-                            <option value="{{ kategori.id }}" {% if form_data and form_data.kategori_id == kategori.id|string %}selected{% endif %}>
-                                {{ kategori.nama_kategori }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="col-md-6">
-                    <label for="foto" class="form-label">Unggah Foto (Opsional)</label>
-                    <input class="form-control" type="file" id="foto" name="foto" accept="image/png, image/jpeg, image/jpg">
-                </div>
-
-                <div class="col-12">
-                    <label class="form-label mt-3">Lokasi Laporan <span class="text-danger">*</span></label>
-                    <div id="map" class="mb-2"></div>
-                    <small class="form-text text-muted">
-                        <i class="bi bi-info-circle me-1"></i> Klik pada peta atau geser pin untuk menentukan lokasi yang akurat.
-                    </small>
-                </div>
-
-                <div class="col-md-6">
-                    <label for="kecamatan" class="form-label">Kecamatan <span class="text-danger">*</span></label>
-                    <select class="form-select" id="kecamatan" name="kecamatan" required>
-                        <option selected disabled value="">Pilih Kecamatan...</option>
-                        {% for kec in data_wilayah.keys()|sort %}
-                            <option value="{{ kec }}" {% if form_data and form_data.kecamatan == kec %}selected{% endif %}>{{ kec }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-6">
-                    <label for="kelurahan" class="form-label">Kelurahan <span class="text-danger">*</span></label>
-                    <select class="form-select" id="kelurahan" name="kelurahan" required>
-                        <option selected disabled value="">Pilih Kecamatan Dulu...</option>
-                    </select>
-                </div>
-
-                <input type="hidden" id="latitude" name="latitude" value="{{ form_data.latitude or '' }}" required>
-                <input type="hidden" id="longitude" name="longitude" value="{{ form_data.longitude or '' }}" required>
-            </div>
-
-            <div class="d-grid mt-5">
-                <button type="submit" class="btn btn-submit-elegant btn-lg">
-                    <i class="bi bi-send-fill me-2"></i> Kirim Laporan
-                </button>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
 </div>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 {% endblock %}
 
 {% block scripts %}
@@ -314,18 +378,22 @@
                 var option = document.createElement('option');
                 option.value = kel;
                 option.textContent = kel;
+                // Cek apakah kelurahan ini sama dengan nilai yang disimpan di form_data
+                var oldKelurahan = "{{ form_data.kelurahan or '' }}";
+                if (oldKelurahan === kel) {
+                    option.selected = true;
+                }
                 kelurahanSelect.appendChild(option);
             });
         });
 
+        // Logika untuk mengisi ulang kelurahan saat pertama kali dimuat (jika ada form_data)
         if (kecamatanSelect.value) {
-            kecamatanSelect.dispatchEvent(new Event('change'));
-            setTimeout(function() {
-                var oldKelurahan = "{{ form_data.kelurahan or '' }}";
-                if (oldKelurahan) {
-                    kelurahanSelect.value = oldKelurahan;
-                }
-            }, 150);
+            // Kita tidak perlu menggunakan setTimeout lagi karena sekarang kita melakukan pre-selection di loop di atas
+             kecamatanSelect.dispatchEvent(new Event('change'));
+        } else {
+             // Jika tidak ada nilai yang tersimpan, pastikan kelurahan disabled
+            kelurahanSelect.innerHTML = '<option selected disabled value="">Pilih Kecamatan Dulu...</option>';
         }
     });
 </script>

@@ -1,177 +1,189 @@
-{% extends "admin/layout.html" %}
-
-{% block title %}Manajemen Data Master{% endblock %}
-
-{% block page_title %}Manajemen Data Master{% endblock %}
-
-{% block content %}
+{% extends "admin/layout.html" %} {% block title %}Manajemen Data Master{% endblock %} {% block page_title %}Manajemen Data Master{% endblock %} {% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
 <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
-    <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="pills-dinas-tab" data-bs-toggle="pill" data-bs-target="#pills-dinas" type="button" role="tab">Manajemen Dinas</button>
-    </li>
-    <li class="nav-item" role="presentation">
-        <button class="nav-link" id="pills-kategori-tab" data-bs-toggle="pill" data-bs-target="#pills-kategori" type="button" role="tab">Manajemen Kategori</button>
-    </li>
+     <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="pills-dinas-tab" data-bs-toggle="pill" data-bs-target="#pills-dinas" type="button" role="tab">Manajemen Dinas</button>
+     </li>
+     <li class="nav-item" role="presentation">
+          <button class="nav-link" id="pills-kategori-tab" data-bs-toggle="pill" data-bs-target="#pills-kategori" type="button" role="tab">Manajemen Kategori</button>
+     </li>
 </ul>
 
 <div class="tab-content" id="pills-tabContent">
-    <div class="tab-pane fade show active" id="pills-dinas" role="tabpanel">
-        <div class="row">
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-header"><h5>Tambah Dinas Baru</h5></div>
-                    <div class="card-body">
-                        <form method="post" action="{{ url_for('tambah_dinas') }}">
-                            <div class="mb-3">
-                                <label for="nama_dinas" class="form-label">Nama Dinas</label>
-                                <input type="text" class="form-control" id="nama_dinas" name="nama_dinas" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="kontak" class="form-label">Nomor Kontak WhatsApp</label>
-                                <input type="text" class="form-control" id="kontak" name="kontak" placeholder="Contoh: 628123456789" required>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Tambah Dinas</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-header"><h5>Daftar Dinas Terdaftar</h5></div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Nama Dinas</th>
-                                        <th>Kontak WhatsApp</th>
-                                        <th>Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                {% for dinas in dinas_list %}
-                                    <tr>
-                                        <td>{{ dinas.nama_dinas }}</td>
-                                        <td>{{ dinas.kontak }}</td>
-                                        <td>
-                                            <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editDinasModal-{{ dinas.id }}">Edit</button>
-                                            <a href="{{ url_for('hapus_dinas', id=dinas.id) }}" class="btn btn-danger btn-sm" onclick="return confirm('Anda yakin?')">Hapus</a>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+     <div class="tab-pane fade show active" id="pills-dinas" role="tabpanel">
+          <div class="row">
+               <div class="col-md-4">
+                    <div class="card shadow-sm">
+                         <div class="card-header bg-light"><h5>Tambah Dinas Baru</h5></div>
+                         <div class="card-body">
+                              <form method="post" action="{{ url_for('tambah_dinas') }}">
+                                   <div class="input-group-custom-admin">
+                                        <i class="icon fas fa-building"></i>
+                                        <label for="nama_dinas" class="form-label visually-hidden">Nama Dinas</label>
+                                        <input type="text" class="form-control" id="nama_dinas" name="nama_dinas" placeholder="Nama Dinas" required />
+                                   </div>
 
-    <div class="tab-pane fade" id="pills-kategori" role="tabpanel">
-        <div class="row">
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-header"><h5>Tambah Kategori Baru</h5></div>
-                    <div class="card-body">
-                        <form method="post" action="{{ url_for('tambah_kategori') }}">
-                            <div class="mb-3">
-                                <label for="nama_kategori" class="form-label">Nama Kategori</label>
-                                <input type="text" class="form-control" id="nama_kategori" name="nama_kategori" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="deskripsi_kategori" class="form-label">Deskripsi (Opsional)</label>
-                                <textarea class="form-control" id="deskripsi_kategori" name="deskripsi" rows="2"></textarea>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Tambah Kategori</button>
-                        </form>
+                                   <div class="input-group-custom-admin">
+                                        <i class="icon fas fa-whatsapp"></i>
+                                        <label for="kontak" class="form-label visually-hidden">Nomor Kontak WhatsApp</label>
+                                        <input type="text" class="form-control" id="kontak" name="kontak" placeholder="Nomor Kontak WhatsApp (Contoh: 62812...)" required />
+                                   </div>
+
+                                   <button type="submit" class="btn btn-custom-submit w-100 mt-3">Tambah Dinas</button>
+                              </form>
+                         </div>
                     </div>
-                </div>
-            </div>
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-header"><h5>Daftar Kategori Laporan</h5></div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Nama Kategori</th>
-                                        <th>Deskripsi</th>
-                                        <th>Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                {% for kat in kategori_list %}
-                                    <tr>
-                                        <td>{{ kat.nama_kategori }}</td>
-                                        <td>{{ kat.deskripsi or '-' }}</td>
-                                        <td>
-                                            <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editKategoriModal-{{ kat.id }}">Edit</button>
-                                            <a href="{{ url_for('hapus_kategori', id=kat.id) }}" class="btn btn-danger btn-sm" onclick="return confirm('Anda yakin?')">Hapus</a>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
+               </div>
+               <div class="col-md-8">
+                    <div class="card shadow-sm">
+                         <div class="card-header bg-light"><h5>Daftar Dinas Terdaftar</h5></div>
+                         <div class="card-body">
+                              <div class="table-responsive">
+                                   <table class="table table-hover">
+                                        <thead>
+                                             <tr>
+                                                  <th>Nama Dinas</th>
+                                                  <th>Kontak WhatsApp</th>
+                                                  <th>Aksi</th>
+                                             </tr>
+                                        </thead>
+                                        <tbody>
+                                             {% for dinas in dinas_list %}
+                                             <tr>
+                                                  <td>{{ dinas.nama_dinas }}</td>
+                                                  <td>{{ dinas.kontak }}</td>
+                                                  <td>
+                                                       <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editDinasModal-{{ dinas.id }}">Edit</button>
+                                                       <a href="{{ url_for('hapus_dinas', id=dinas.id) }}" class="btn btn-danger btn-sm" onclick="return confirm('Anda yakin?')">Hapus</a>
+                                                  </td>
+                                             </tr>
+                                             {% endfor %}
+                                        </tbody>
+                                   </table>
+                              </div>
+                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
+               </div>
+          </div>
+     </div>
+
+     <div class="tab-pane fade" id="pills-kategori" role="tabpanel">
+          <div class="row">
+               <div class="col-md-4">
+                    <div class="card shadow-sm">
+                         <div class="card-header bg-light"><h5>Tambah Kategori Baru</h5></div>
+                         <div class="card-body">
+                              <form method="post" action="{{ url_for('tambah_kategori') }}">
+                                   <div class="input-group-custom-admin">
+                                        <i class="icon fas fa-tags"></i>
+                                        <label for="nama_kategori" class="form-label visually-hidden">Nama Kategori</label>
+                                        <input type="text" class="form-control" id="nama_kategori" name="nama_kategori" placeholder="Nama Kategori" required />
+                                   </div>
+
+                                   <div class="input-group-custom-admin">
+                                        <i class="icon fas fa-info-circle"></i>
+                                        <label for="deskripsi_kategori" class="form-label visually-hidden">Deskripsi (Opsional)</label>
+                                        <textarea class="form-control" id="deskripsi_kategori" name="deskripsi" rows="2" placeholder="Deskripsi (Opsional)"></textarea>
+                                   </div>
+
+                                   <button type="submit" class="btn btn-custom-submit w-100 mt-3">Tambah Kategori</button>
+                              </form>
+                         </div>
+                    </div>
+               </div>
+               <div class="col-md-8">
+                    <div class="card shadow-sm">
+                         <div class="card-header bg-light"><h5>Daftar Kategori Laporan</h5></div>
+                         <div class="card-body">
+                              <div class="table-responsive">
+                                   <table class="table table-hover">
+                                        <thead>
+                                             <tr>
+                                                  <th>Nama Kategori</th>
+                                                  <th>Deskripsi</th>
+                                                  <th>Aksi</th>
+                                             </tr>
+                                        </thead>
+                                        <tbody>
+                                             {% for kat in kategori_list %}
+                                             <tr>
+                                                  <td>{{ kat.nama_kategori }}</td>
+                                                  <td>{{ kat.deskripsi or '-' }}</td>
+                                                  <td>
+                                                       <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editKategoriModal-{{ kat.id }}">Edit</button>
+                                                       <a href="{{ url_for('hapus_kategori', id=kat.id) }}" class="btn btn-danger btn-sm" onclick="return confirm('Anda yakin?')">Hapus</a>
+                                                  </td>
+                                             </tr>
+                                             {% endfor %}
+                                        </tbody>
+                                   </table>
+                              </div>
+                         </div>
+                    </div>
+               </div>
+          </div>
+     </div>
 </div>
 
 {% for dinas in dinas_list %}
 <div class="modal fade" id="editDinasModal-{{ dinas.id }}" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header"><h5 class="modal-title">Edit Dinas</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-            <form action="{{ url_for('edit_dinas', id=dinas.id) }}" method="post">
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Nama Dinas</label>
-                        <input type="text" class="form-control" name="nama_dinas" value="{{ dinas.nama_dinas }}" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Nomor Kontak WhatsApp</label>
-                        <input type="text" class="form-control" name="kontak" value="{{ dinas.kontak }}" required>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-{% endfor %}
+     <div class="modal-dialog">
+          <div class="modal-content">
+               <div class="modal-header">
+                    <h5 class="modal-title">Edit Dinas</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+               </div>
+               <form action="{{ url_for('edit_dinas', id=dinas.id) }}" method="post">
+                    <div class="modal-body">
+                         <div class="input-group-custom-admin">
+                              <i class="icon fas fa-building"></i>
+                              <label class="form-label visually-hidden">Nama Dinas</label>
+                              <input type="text" class="form-control" name="nama_dinas" value="{{ dinas.nama_dinas }}" placeholder="Nama Dinas" required />
+                         </div>
 
-{% for kat in kategori_list %}
-<div class="modal fade" id="editKategoriModal-{{ kat.id }}" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header"><h5 class="modal-title">Edit Kategori</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-            <form action="{{ url_for('edit_kategori', id=kat.id) }}" method="post">
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Nama Kategori</label>
-                        <input type="text" class="form-control" name="nama_kategori" value="{{ kat.nama_kategori }}" required>
+                         <div class="input-group-custom-admin">
+                              <i class="icon fas fa-whatsapp"></i>
+                              <label class="form-label visually-hidden">Nomor Kontak WhatsApp</label>
+                              <input type="text" class="form-control" name="kontak" value="{{ dinas.kontak }}" placeholder="Nomor Kontak WhatsApp" required />
+                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Deskripsi</label>
-                        <textarea class="form-control" name="deskripsi" rows="2">{{ kat.deskripsi or '' }}</textarea>
+                    <div class="modal-footer">
+                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                         <button type="submit" class="btn btn-custom-submit">Simpan Perubahan</button>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
-                </div>
-            </form>
-        </div>
-    </div>
+               </form>
+          </div>
+     </div>
 </div>
-{% endfor %}
-{% endblock %}
+{% endfor %} {% for kat in kategori_list %}
+<div class="modal fade" id="editKategoriModal-{{ kat.id }}" tabindex="-1">
+     <div class="modal-dialog">
+          <div class="modal-content">
+               <div class="modal-header">
+                    <h5 class="modal-title">Edit Kategori</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+               </div>
+               <form action="{{ url_for('edit_kategori', id=kat.id) }}" method="post">
+                    <div class="modal-body">
+                         <div class="input-group-custom-admin">
+                              <i class="icon fas fa-tags"></i>
+                              <label class="form-label visually-hidden">Nama Kategori</label>
+                              <input type="text" class="form-control" name="nama_kategori" value="{{ kat.nama_kategori }}" placeholder="Nama Kategori" required />
+                         </div>
+
+                         <div class="input-group-custom-admin">
+                              <i class="icon fas fa-info-circle"></i>
+                              <label class="form-label visually-hidden">Deskripsi</label>
+                              <textarea class="form-control" name="deskripsi" rows="2" placeholder="Deskripsi">{{ kat.deskripsi or '' }}</textarea>
+                         </div>
+                    </div>
+                    <div class="modal-footer">
+                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                         <button type="submit" class="btn btn-custom-submit">Simpan Perubahan</button>
+                    </div>
+               </form>
+          </div>
+     </div>
+</div>
+{% endfor %} {% endblock %}
