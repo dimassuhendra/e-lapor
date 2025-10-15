@@ -259,8 +259,8 @@ def lapor():
         conn.commit()
         conn.close()
 
-        flash(f'Laporan Anda berhasil dikirim dengan nomor: {nomor_laporan_baru}', 'success')
-        return redirect(url_for('index'))
+        flash(f'Laporan Anda berhasil dikirim dengan nomor: {nomor_laporan_baru}. Simpan nomor ini jika anda ingin melacaknya!', 'success')
+        return redirect(url_for('home'))
 
     conn.close()
     return render_template('lapor.html', data_wilayah=DATA_WILAYAH, kategori_list=kategori_list, form_data={})
