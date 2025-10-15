@@ -265,6 +265,36 @@ def lapor():
     conn.close()
     return render_template('lapor.html', data_wilayah=DATA_WILAYAH, kategori_list=kategori_list, form_data={})
 
+@app.route('/lacak', methods=['GET'])
+def lacak_laporan():
+    """Menampilkan halaman formulir untuk melacak laporan."""
+    return render_template('lacak_laporan.html')
+
+@app.route('/lacak/proses', methods=['GET'])
+def lacak_laporan_proses():
+    """Memproses pelacakan laporan berdasarkan nomor laporan."""
+    nomor_laporan = request.args.get('nomor_laporan', '').strip().upper()
+    
+    if not nomor_laporan:
+        # Jika nomor laporan kosong
+        flash('Nomor laporan tidak boleh kosong.', 'warning')
+        return redirect(url_for('lacak_laporan'))
+    
+    conn = get_db_connection()
+    # Pastikan l.nomor_laporan di database disimpan dalam format UPPERCASE jika Anda ingin pencarian case-insensitive
+    query = "SELECT id FROM laporan WHERE nomor_laporan = ?"
+    laporan_data = conn.execute(query, (nomor_laporan,)).fetchone()
+    conn.close()
+    
+    if laporan_data:
+        # Laporan ditemukan, arahkan ke halaman detail laporan (asumsi rute 'detail_laporan' sudah ada)
+        laporan_id = laporan_data['id']
+        return redirect(url_for('detail_laporan', laporan_id=laporan_id))
+    else:
+        # Laporan tidak ditemukan
+        flash(f'Laporan dengan nomor **{nomor_laporan}** tidak ditemukan. Pastikan nomor laporan sudah benar.', 'danger')
+        return redirect(url_for('lacak_laporan'))
+    
 @app.route('/laporan/<int:laporan_id>')
 def detail_laporan(laporan_id):
     conn = get_db_connection()

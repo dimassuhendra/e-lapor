@@ -233,7 +233,7 @@
      <body>
           <nav class="navbar navbar-expand-lg sticky-top">
                <div class="container">
-                    <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
+                    <a class="navbar-brand d-flex align-items-center" href="{{ url_for('home') }}">
                          <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo Bandar Lampung" class="img-fluid me-2" style="max-height: 40px; width: auto" />
                          <div class="navbar-title">
                               <span class="main-title">Lapor!</span>
@@ -294,7 +294,7 @@
                          <div class="col-12 col-md-4 text-start d-flex flex-column text-center">
                               <ul class="list-unstyled footer-link">
                                    <li><a href="{{ url_for('lapor') }}" target="_blank" rel="noopener noreferrer" class="text-decoration-none">Buat Laporan Baru</a></li>
-                                   <li><a href="#" target="_blank" rel="noopener noreferrer" class="text-decoration-none">Lacak Laporan</a></li>
+                                   <li><a href="{{url_for('lacak_laporan')}}" target="_blank" rel="noopener noreferrer" class="text-decoration-none">Lacak Laporan</a></li>
                                    <li><a href="#" rel="noopener noreferrer" class="text-decoration-none">Statistik Laporan</a></li>
                                    <li><a href="#" target="_blank" rel="noopener noreferrer" class="text-decoration-none">FAQ</a></li>
                               </ul>

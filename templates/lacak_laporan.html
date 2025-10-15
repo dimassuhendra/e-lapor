@@ -1,0 +1,211 @@
+{% extends "layout.html" %}
+{% block title %}Lacak Laporan{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"> 
+
+<style>
+    /* Variabel Root yang Sesuai dengan Tema Anda (dipertahankan) */
+    :root {
+        --secondary-blue: #1e88e5; 
+        --accent-green: #00897b; /* Hijau Teal - untuk tombol utama */
+        --dark-text: #343a40; 
+        --sub-text: #6c757d; 
+        
+        --lapor-primary: #8be9fd; /* Biru Muda Neon */
+        --lapor-dark: #172a3a;
+    }
+
+    /* --- STYLING UTAMA (Dipertahankan) --- */
+    body {
+        background-color: #0b1a2b;
+    }
+    .form-center-container {
+        min-height: 100vh;
+        display: flex; 
+        align-items: center; 
+        justify-content: center;
+        padding: 40px 0;
+        flex-direction: column;
+    }
+    .split-form-container {
+        max-width: 900px; /* Diperkecil karena formulir lebih sederhana */
+        margin: 0 auto;
+        border-radius: 1.5rem;
+        overflow: hidden; 
+        box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+        width: 90%; 
+        display: grid; 
+        grid-template-columns: 1fr 1.5fr; /* Panel kiri lebih kecil, form kanan lebih lebar */
+        background-color: white; 
+    }
+    
+    /* Bagian Copywriting (Kiri) - Diperbarui */
+    .copywriting-panel {
+        background-color: var(--lapor-dark);
+        color: #ffffff;
+        padding: 5rem 3rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+    .copywriting-panel h2 {
+        color: var(--lapor-primary);
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+    .copywriting-icon {
+        font-size: 5rem;
+        color: var(--lapor-primary);
+        margin-bottom: 2rem;
+    }
+
+    /* Bagian Form (Kanan) - Dipertahankan */
+    .form-panel {
+        background-color: #ffffff; 
+        padding: 4rem;
+    }
+    .form-panel .form-title { 
+        color: var(--lapor-dark);
+        font-weight: 600;
+        border-bottom: 2px solid var(--lapor-primary);
+        display: inline-block;
+        padding-bottom: 5px;
+        margin-bottom: 2rem;
+    }
+    
+    /* === STYLING INPUT KHUSUS === */
+    .input-group-field {
+        position: relative;
+    }
+
+    .input-group-field .form-control:focus {
+        border-bottom-color: var(--lapor-primary);
+        box-shadow: none !important;
+    }
+
+    .input-group-field .form-control {
+        background: none;
+        border: none;
+        border-bottom: 2px solid var(--sub-text); 
+        border-radius: 0;
+        color: var(--dark-text);
+        padding-left: 35px; /* Jarak untuk ikon */
+        font-weight: 500;
+        box-shadow: none !important;
+        transition: border-color 0.3s;
+    }
+
+    .input-group-field .icon {
+        position: absolute;
+        left: 0;
+        top: 38px; 
+        transform: translateY(-50%);
+        color: var(--lapor-primary); 
+        font-size: 1.2rem;
+        pointer-events: none;
+        z-index: 5; 
+    }
+    
+    .btn-submit-elegant {
+        background-color: var(--accent-green); 
+        border-color: var(--accent-green);
+        color: white;
+        font-weight: bold;
+    }
+    .btn-submit-elegant:hover {
+        background-color: #00695c;
+        border-color: #00695c;
+    }
+
+
+    /* --- REFACTORING MEDIA QUERIES UNTUK RESPONSIVITAS --- */
+    @media (max-width: 991.98px) {
+        .split-form-container {
+            grid-template-columns: 1fr; 
+        }
+        .copywriting-panel {
+            padding: 3rem 2rem; 
+        }
+        .form-panel {
+            padding: 3rem 1.5rem; 
+        }
+    }
+
+    @media (max-width: 767.98px) {
+        .form-center-container {
+            padding: 0; 
+        }
+        .split-form-container {
+            width: 100%;
+            border-radius: 0; 
+            box-shadow: none; 
+        }
+        .copywriting-panel {
+            display: none !important; 
+        }
+        .form-panel {
+            padding: 2rem 1rem; 
+        }
+    }
+</style>
+
+<div class="form-center-container">
+    <div class="split-form-container">
+        <div class="copywriting-panel d-none d-lg-flex">
+            <div>
+                <i class="copywriting-icon fas fa-map-marker-alt"></i>
+                <h2>Lacak Status Laporan</h2>
+                <p>Cek perkembangan terbaru dari laporan yang sudah Anda kirimkan. Ketahui status, tindakan, dan tanggapan resmi.</p>
+                <div class="mt-4 pt-3 border-top border-secondary">
+                    <p class="small text-white-50 mb-0">Layanan Aspirasi dan Pengaduan Online Rakyat Kota Bandar Lampung</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-panel">
+            <h3 class="form-title">
+                <i class="fas fa-search me-2"></i> Lacak Berdasarkan Nomor Laporan
+            </h3>
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="mb-4">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message | safe }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <form action="{{ url_for('lacak_laporan_proses') }}" method="GET" id="lacakForm">
+                <div class="row g-4">
+                    <div class="col-12">
+                        <div class="input-group-field">
+                            <i class="icon fas fa-ticket-alt"></i>
+                            <label for="nomor_laporan" class="form-label">Nomor Laporan <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="nomor_laporan" name="nomor_laporan" required 
+                                placeholder="Contoh: KDT-05/10-0042">
+                            <small class="form-text text-muted">
+                                Masukkan nomor laporan yang Anda terima setelah pengiriman.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-grid mt-5">
+                    <button type="submit" class="btn btn-submit-elegant btn-lg">
+                        <i class="fas fa-search me-2"></i> Cek Status
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
